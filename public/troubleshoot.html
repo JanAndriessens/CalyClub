@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dépannage - CalyBase</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .troubleshoot-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .issue-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .solution-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-weight: bold;
+        }
+        .solution-button:hover {
+            background: #0056b3;
+        }
+        .danger-button {
+            background: #dc3545;
+        }
+        .danger-button:hover {
+            background: #c82333;
+        }
+        .success-button {
+            background: #28a745;
+        }
+        .success-button:hover {
+            background: #218838;
+        }
+        .status-indicator {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status-ok {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .status-unknown {
+            background: #fff3cd;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo-container">
+            <div class="logo-image">
+                <img src="images/CalypsoDC-VerticPos_rvb.png" alt="CalypsoDC Logo">
+            </div>
+            <div class="logo-text-container">
+                <div class="logo-text">CalyBase</div>
+                <div class="username-text" id="usernameText" style="display: none;"></div>
+            </div>
+        </div>
+        <div class="nav-links">
+            <a href="/">Accueil</a>
+            <a href="/membres.html">Membres</a>
+            <a href="/login.html">Déconnexion</a>
+        </div>
+    </nav>
+
+    <div class="troubleshoot-container">
+        <h1>🔧 Dépannage CalyBase</h1>
+        <p>Cette page vous aide à résoudre les problèmes courants avec CalyBase.</p>
+
+        <!-- System Status -->
+        <div class="issue-card">
+            <h3>📊 État du système</h3>
+            <div id="systemStatus">
+                <p>Vérification en cours...</p>
+            </div>
+            <button class="solution-button" id="checkStatusBtn">🔄 Vérifier l'état</button>
+        </div>
+
+        <!-- Firebase Issues -->
+        <div class="issue-card">
+            <h3>🔥 Problèmes Firebase</h3>
+            <p><strong>Symptômes:</strong></p>
+            <ul>
+                <li>Message "firebase.storage is not a function"</li>
+                <li>Erreur de persistance Firestore</li>
+                <li>Données en cache obsolètes</li>
+            </ul>
+            <p><strong>Solutions:</strong></p>
+            <button class="solution-button danger-button" id="clearCacheBtn">🧹 Nettoyer le cache Firebase</button>
+            <button class="solution-button" id="reloadPageBtn">🔄 Actualiser la page</button>
+        </div>
+
+        <!-- Authentication Issues -->
+        <div class="issue-card">
+            <h3>🔐 Problèmes d'authentification</h3>
+            <p><strong>Symptômes:</strong></p>
+            <ul>
+                <li>Impossible de se connecter</li>
+                <li>Déconnexion automatique</li>
+                <li>Pages protégées inaccessibles</li>
+            </ul>
+            <p><strong>Solutions:</strong></p>
+            <button class="solution-button" id="forceLogoutBtn">🚪 Forcer la déconnexion</button>
+            <button class="solution-button success-button" id="goToLoginBtn">👤 Aller à la connexion</button>
+        </div>
+
+        <!-- Browser Issues -->
+        <div class="issue-card">
+            <h3>🌐 Problèmes de navigateur</h3>
+            <p><strong>Symptômes:</strong></p>
+            <ul>
+                <li>Pages qui ne se chargent pas</li>
+                <li>JavaScript désactivé</li>
+                <li>Cookies bloqués</li>
+            </ul>
+            <p><strong>Solutions:</strong></p>
+            <button class="solution-button" id="checkBrowserBtn">🔍 Vérifier le navigateur</button>
+            <button class="solution-button danger-button" id="clearAllDataBtn">🗑️ Vider tout le cache navigateur</button>
+        </div>
+
+        <!-- Manual Diagnostics -->
+        <div class="issue-card">
+            <h3>🩺 Diagnostics</h3>
+            <p>Informations techniques pour le support:</p>
+            <div id="diagnosticInfo" style="background: #f1f3f4; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px; white-space: pre-wrap; max-height: 200px; overflow-y: auto;">
+            Cliquez sur "Générer rapport" pour afficher les informations de diagnostic
+            </div>
+            <button class="solution-button" id="generateReportBtn">📋 Générer rapport de diagnostic</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="clear-cache.js"></script>
+    <script src="firebase-app.js"></script>
+    <script src="navigation.js"></script>
+
+    <script>
+        // System status check
+        function checkSystemStatus() {
+            const statusDiv = document.getElementById('systemStatus');
+            statusDiv.innerHTML = `
+                <p>Firebase SDK: ${typeof firebase !== 'undefined' ? '✅ Chargé' : '❌ Non chargé'}</p>
+                <p>Configuration Firebase: ${window.firebaseConfig ? '✅ Disponible' : '❌ Manquante'}</p>
+                <p>Auth Firebase: ${window.auth ? '✅ Initialisé' : '❌ Non initialisé'}</p>
+                <p>Firestore: ${window.db ? '✅ Initialisé' : '❌ Non initialisé'}</p>
+                <p>Storage: ${window.storage ? '✅ Initialisé' : '❌ Non initialisé'}</p>
+                <p>LocalStorage: ${typeof localStorage !== 'undefined' ? '✅ Disponible' : '❌ Indisponible'}</p>
+                <p>IndexedDB: ${typeof indexedDB !== 'undefined' ? '✅ Disponible' : '❌ Indisponible'}</p>
+            `;
+        }
+
+        // Force logout
+        async function forceLogout() {
+            try {
+                if (window.auth) {
+                    await window.auth.signOut();
+                }
+                localStorage.clear();
+                sessionStorage.clear();
+                alert('✅ Déconnexion forcée réussie. Redirection vers la page de connexion...');
+                window.location.href = '/login.html';
+            } catch (error) {
+                alert('❌ Erreur lors de la déconnexion: ' + error.message);
+            }
+        }
+
+        // Check browser support
+        function checkBrowserSupport() {
+            const features = {
+                'JavaScript': typeof window !== 'undefined',
+                'LocalStorage': typeof localStorage !== 'undefined',
+                'SessionStorage': typeof sessionStorage !== 'undefined',
+                'IndexedDB': typeof indexedDB !== 'undefined',
+                'Fetch API': typeof fetch !== 'undefined',
+                'Promises': typeof Promise !== 'undefined',
+                'ES6 Classes': typeof class {} === 'function',
+                'Service Workers': 'serviceWorker' in navigator
+            };
+
+            let report = 'Support du navigateur:\n\n';
+            for (const [feature, supported] of Object.entries(features)) {
+                report += `${feature}: ${supported ? '✅ Supporté' : '❌ Non supporté'}\n`;
+            }
+
+            alert(report);
+        }
+
+        // Clear all browser data
+        function clearAllBrowserData() {
+            if (confirm('⚠️ Attention! Ceci va supprimer TOUTES les données de ce site (connexions, préférences, etc.).\n\nÊtes-vous sûr de vouloir continuer?')) {
+                clearFirebaseCache().then(() => {
+                    alert('🎉 Toutes les données ont été supprimées. La page va se recharger.');
+                    window.location.reload();
+                });
+            }
+        }
+
+        // Generate diagnostic report
+        function generateDiagnosticReport() {
+            const report = {
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+                url: window.location.href,
+                firebase: {
+                    sdkLoaded: typeof firebase !== 'undefined',
+                    version: typeof firebase !== 'undefined' ? firebase.SDK_VERSION : 'N/A',
+                    config: !!window.firebaseConfig,
+                    auth: !!window.auth,
+                    firestore: !!window.db,
+                    storage: !!window.storage
+                },
+                storage: {
+                    localStorage: Object.keys(localStorage),
+                    sessionStorage: Object.keys(sessionStorage)
+                },
+                errors: [] // Could be populated by error handlers
+            };
+
+            document.getElementById('diagnosticInfo').textContent = JSON.stringify(report, null, 2);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            checkSystemStatus();
+            
+            // Auto-generate diagnostic report
+            setTimeout(generateDiagnosticReport, 1000);
+            
+            // Add event listeners for all buttons
+            document.getElementById('checkStatusBtn')?.addEventListener('click', checkSystemStatus);
+            document.getElementById('clearCacheBtn')?.addEventListener('click', clearFirebaseCache);
+            document.getElementById('reloadPageBtn')?.addEventListener('click', () => window.location.reload());
+            document.getElementById('forceLogoutBtn')?.addEventListener('click', forceLogout);
+            document.getElementById('goToLoginBtn')?.addEventListener('click', () => window.location.href = '/login.html');
+            document.getElementById('checkBrowserBtn')?.addEventListener('click', checkBrowserSupport);
+            document.getElementById('clearAllDataBtn')?.addEventListener('click', clearAllBrowserData);
+            document.getElementById('generateReportBtn')?.addEventListener('click', generateDiagnosticReport);
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annuaire - Who is who? - CalyClub</title>
+    
+    <!-- DEPLOYMENT VERIFICATION -->
+    <script src="deployment-timestamp.js"></script>
+    
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="who-is-who.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Application utilities -->
+    <script src="constants.js"></script>
+    <script src="device-utils.js"></script>
+    <script src="error-handler.js"></script>
+    <script src="logger.js"></script>
+    
+    <!-- CRITICAL: Firebase Config (MUST load first) -->
+    <script src="firebase-config.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    
+    <!-- External libraries for export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+</head>
+<body>
+    <!-- Header avec breadcrumb et contrôles -->
+    <header class="annuaire-header">
+        <div class="breadcrumb">
+            <a href="/membres.html" class="breadcrumb-link">
+                <i class="fas fa-arrow-left"></i> Retour aux Membres
+            </a>
+        </div>
+        <div class="header-content">
+            <h1><i class="fas fa-address-book"></i> Annuaire - Who is who?</h1>
+            <div class="header-controls">
+                <div class="export-controls">
+                    <div class="dropdown">
+                        <button id="exportBtn" class="export-btn">
+                            <i class="fas fa-download"></i> Export <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-content" id="exportMenu">
+                            <a href="#" data-export="csv-links">
+                                <i class="fas fa-table"></i> CSV avec liens images
+                            </a>
+                            <a href="#" data-export="zip-package">
+                                <i class="fas fa-file-archive"></i> ZIP complet (InDesign)
+                            </a>
+                            <a href="#" data-export="pdf">
+                                <i class="fas fa-file-pdf"></i> PDF prêt à imprimer
+                            </a>
+                            <a href="#" data-export="json">
+                                <i class="fas fa-code"></i> JSON pour développeurs
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <button id="printBtn" class="print-btn">
+                    <i class="fas fa-print"></i> Imprimer
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contrôles de vue -->
+    <div class="annuaire-controls no-print">
+        <div class="view-options">
+            <label class="checkbox-label">
+                <input type="checkbox" id="hideNoPhoto">
+                <span class="checkmark"></span>
+                Masquer membres sans photo
+            </label>
+            <div class="sort-group">
+                <label for="sortBy">Trier par:</label>
+                <select id="sortBy">
+                    <option value="nom">Nom (A-Z)</option>
+                    <option value="prenom">Prénom (A-Z)</option>
+                    <option value="lifrasID">ID Lifras</option>
+                </select>
+            </div>
+        </div>
+        <div class="layout-options">
+            <span class="layout-label">Colonnes:</span>
+            <button class="layout-btn active" data-cols="4">4</button>
+            <button class="layout-btn" data-cols="5">5</button>
+            <button class="layout-btn" data-cols="6">6</button>
+        </div>
+    </div>
+
+    <!-- Status bar -->
+    <div class="status-bar no-print">
+        <div class="member-count">
+            <i class="fas fa-users"></i>
+            <span id="memberCount">0</span> membres affichés
+        </div>
+        <div class="last-updated">
+            Dernière mise à jour: <span id="lastUpdated">-</span>
+        </div>
+    </div>
+
+    <!-- Container principal pour l'annuaire -->
+    <main class="annuaire-container">
+        <div id="loadingMessage" class="loading-message">
+            <i class="fas fa-spinner fa-spin"></i>
+            Chargement de l'annuaire...
+        </div>
+        
+        <div id="annuaireGrid" class="annuaire-grid" style="display: none;">
+            <!-- Les cartes membres seront insérées ici dynamiquement -->
+        </div>
+        
+        <div id="noMembersMessage" class="no-members-message" style="display: none;">
+            <i class="fas fa-users-slash"></i>
+            <p>Aucun membre trouvé avec les critères sélectionnés</p>
+        </div>
+    </main>
+
+    <!-- Footer pour impression -->
+    <footer class="print-footer print-only">
+        <div class="footer-content">
+            <div class="footer-left">
+                <strong>CalyClub - Annuaire des Membres</strong>
+            </div>
+            <div class="footer-right">
+                Généré le <span id="printDate"></span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="clear-cache.js"></script>
+    <script src="firebase-app.js"></script>
+    <script src="system-config.js"></script>
+    <script src="avatar-utils.js"></script>
+    <script src="member-permissions.js"></script>
+    <script src="comprehensive-logout.js"></script>
+    <script src="navigation.js"></script>
+    <script src="simple-logout.js"></script>
+    <script src="session-manager.js"></script>
+    <script src="who-is-who.js"></script>
+</body>
+</html>

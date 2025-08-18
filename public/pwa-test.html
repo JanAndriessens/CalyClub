@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0066cc">
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="CalyBase PWA Test Page">
+    
+    <title>PWA Test - CalyBase</title>
+    
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.info {
+            background: #cce7ff;
+            color: #004085;
+            border: 1px solid #b3d9ff;
+        }
+        
+        button {
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 16px;
+        }
+        
+        button:hover {
+            background: #0052a3;
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .test-section {
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        
+        h2 {
+            color: #0066cc;
+            margin-top: 0;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo h1 {
+            color: #0066cc;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="/icons/icon-192x192.png" alt="CalyBase Icon" width="96" height="96">
+            <h1>CalyBase PWA Test</h1>
+        </div>
+
+        <div class="test-section">
+            <h2>🔧 Service Worker Status</h2>
+            <div id="sw-status" class="status info">Testing...</div>
+            <div id="sw-details"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>📱 PWA Installation</h2>
+            <div id="install-status" class="status info">Checking...</div>
+            <button id="install-btn" onclick="testInstall()" disabled>Install PWA</button>
+            <button onclick="showIOSInstructions()">iOS Instructions</button>
+        </div>
+
+        <div class="test-section">
+            <h2>💾 Offline Storage</h2>
+            <div id="storage-status" class="status info">Testing...</div>
+            <button onclick="testOfflineStorage()">Test Cache</button>
+            <button onclick="clearCache()">Clear Cache</button>
+        </div>
+
+        <div class="test-section">
+            <h2>🔔 Push Notifications</h2>
+            <div id="notification-status" class="status info">Testing...</div>
+            <button onclick="requestNotificationPermission()">Request Permission</button>
+            <button onclick="testNotification()">Test Notification</button>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 PWA Features Support</h2>
+            <div id="features-status"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 Quick Actions</h2>
+            <button onclick="window.location.href='/membres.html'">Go to Members</button>
+            <button onclick="window.location.href='/events.html'">Go to Events</button>
+            <button onclick="window.location.href='/login.html'">Go to Login</button>
+            <button onclick="location.reload()">Reload Page</button>
+        </div>
+    </div>
+
+    <!-- PWA Handler -->
+    <script src="pwa-handler.js"></script>
+
+    <script>
+        // Test Service Worker
+        function updateSWStatus() {
+            const status = document.getElementById('sw-status');
+            const details = document.getElementById('sw-details');
+            
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.ready.then(registration => {
+                    status.className = 'status success';
+                    status.textContent = '✅ Service Worker registered and ready';
+                    details.innerHTML = `
+                        <p><strong>Scope:</strong> ${registration.scope}</p>
+                        <p><strong>State:</strong> ${registration.active ? registration.active.state : 'Unknown'}</p>
+                    `;
+                }).catch(error => {
+                    status.className = 'status error';
+                    status.textContent = '❌ Service Worker failed: ' + error.message;
+                });
+            } else {
+                status.className = 'status error';
+                status.textContent = '❌ Service Workers not supported';
+            }
+        }
+
+        // Test PWA Installation
+        function updateInstallStatus() {
+            const status = document.getElementById('install-status');
+            const btn = document.getElementById('install-btn');
+            
+            // Check if already installed
+            if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
+                status.className = 'status success';
+                status.textContent = '✅ App is installed (standalone mode)';
+                btn.textContent = 'Already Installed';
+                return;
+            }
+            
+            // Check if iOS Safari
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            if (isIOS) {
+                status.className = 'status info';
+                status.textContent = '📱 iOS detected - Use "Add to Home Screen"';
+                btn.textContent = 'Show iOS Instructions';
+                btn.disabled = false;
+                return;
+            }
+            
+            // Check for install prompt
+            if (window.deferredPrompt || (window.PWAHandler && typeof window.PWAHandler.installPWA === 'function')) {
+                status.className = 'status success';
+                status.textContent = '✅ Ready to install';
+                btn.textContent = 'Install App';
+                btn.disabled = false;
+            } else {
+                status.className = 'status info';
+                status.textContent = '⏳ Waiting for install prompt...';
+                btn.textContent = 'Not Ready Yet';
+            }
+        }
+
+        // Test installation
+        function testInstall() {
+            if (window.PWAHandler && window.PWAHandler.installPWA) {
+                window.PWAHandler.installPWA();
+            } else {
+                showIOSInstructions();
+            }
+        }
+
+        // Show iOS instructions
+        function showIOSInstructions() {
+            if (window.PWAHandler && window.PWAHandler.showiOSInstallInstructions) {
+                window.PWAHandler.showiOSInstallInstructions();
+            } else {
+                alert('iOS: Tap Share button, then "Add to Home Screen"');
+            }
+        }
+
+        // Test offline storage
+        function testOfflineStorage() {
+            const status = document.getElementById('storage-status');
+            
+            // Test localStorage
+            try {
+                localStorage.setItem('pwa-test', 'working');
+                const test = localStorage.getItem('pwa-test');
+                
+                if (test === 'working') {
+                    status.className = 'status success';
+                    status.textContent = '✅ Local storage working';
+                } else {
+                    throw new Error('localStorage test failed');
+                }
+            } catch (error) {
+                status.className = 'status error';
+                status.textContent = '❌ Local storage failed: ' + error.message;
+            }
+        }
+
+        // Clear cache
+        function clearCache() {
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                    names.forEach(name => caches.delete(name));
+                    alert('Cache cleared! Reload to re-cache.');
+                });
+            }
+        }
+
+        // Test notifications
+        function requestNotificationPermission() {
+            const status = document.getElementById('notification-status');
+            
+            if (!('Notification' in window)) {
+                status.className = 'status error';
+                status.textContent = '❌ Notifications not supported';
+                return;
+            }
+
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    status.className = 'status success';
+                    status.textContent = '✅ Notification permission granted';
+                } else {
+                    status.className = 'status error';
+                    status.textContent = '❌ Notification permission denied';
+                }
+            });
+        }
+
+        function testNotification() {
+            if (Notification.permission === 'granted') {
+                new Notification('CalyBase Test', {
+                    body: 'PWA notifications are working!',
+                    icon: '/icons/icon-192x192.png'
+                });
+            } else {
+                alert('Please allow notifications first');
+            }
+        }
+
+        // Check PWA features
+        function checkPWAFeatures() {
+            const status = document.getElementById('features-status');
+            const features = [];
+            
+            if ('serviceWorker' in navigator) features.push('✅ Service Workers');
+            else features.push('❌ Service Workers');
+            
+            if ('PushManager' in window) features.push('✅ Push Messaging');
+            else features.push('❌ Push Messaging');
+            
+            if ('Notification' in window) features.push('✅ Notifications');
+            else features.push('❌ Notifications');
+            
+            if ('caches' in window) features.push('✅ Cache API');
+            else features.push('❌ Cache API');
+            
+            if ('indexedDB' in window) features.push('✅ IndexedDB');
+            else features.push('❌ IndexedDB');
+            
+            if (navigator.onLine !== undefined) features.push('✅ Online/Offline Detection');
+            else features.push('❌ Online/Offline Detection');
+            
+            status.innerHTML = features.join('<br>');
+        }
+
+        // Initialize tests
+        document.addEventListener('DOMContentLoaded', () => {
+            updateSWStatus();
+            updateInstallStatus();
+            testOfflineStorage();
+            checkPWAFeatures();
+            
+            // Update install status when prompt becomes available
+            window.addEventListener('beforeinstallprompt', updateInstallStatus);
+        });
+    </script>
+</body>
+</html>

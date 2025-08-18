@@ -1,0 +1,8 @@
+DEPLOYMENT TIMESTAMP: 2025-01-21 FIREBASE FIX DEPLOYED
+COMMIT: 975d168
+FIXES INCLUDED:
+- Firebase initialization timeout fix
+- Enhanced diagnostics
+- Script loading order fixed
+- Console override disabled
+- Increased timeout to 20 seconds

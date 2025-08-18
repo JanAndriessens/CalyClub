@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CalyClub - System Settings</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- CRITICAL: Page Protection (MUST load first) -->
+    <script src="page-protection.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <!-- System Configuration -->
+    <script src="firebase-config.js"></script>
+    <script src="firebase-app.js"></script>
+    <script src="system-config.js"></script>
+    
+    <style>
+        .system-settings-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .page-title {
+            font-size: 2rem;
+            color: var(--secondary-color);
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .settings-icon {
+            font-size: 2rem;
+            color: #666;
+            margin-right: 1rem;
+        }
+
+        .back-button {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: #1565c0;
+            text-decoration: none;
+            color: white;
+        }
+
+        .settings-tabs {
+            display: flex;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .tab-button {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            position: relative;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .tab-button:hover {
+            background: #f5f5f5;
+            color: #1976d2;
+        }
+
+        .tab-button.active {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        .settings-section {
+            display: none;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+        }
+
+        .settings-section.active {
+            display: block;
+        }
+
+        .setting-group {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .setting-group:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .group-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .group-title i {
+            margin-right: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-info {
+            flex: 1;
+        }
+
+        .setting-label {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 0.25rem;
+        }
+
+        .setting-description {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .setting-control {
+            min-width: 200px;
+            text-align: right;
+        }
+
+        .setting-input {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100px;
+            text-align: center;
+        }
+
+        .setting-select {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 150px;
+        }
+
+        .setting-toggle {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .setting-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.3s;
+            border-radius: 30px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(30px);
+        }
+
+        .config-info {
+            background: #e3f2fd;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .config-meta {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .save-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin: 0 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1565c0;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .status-message {
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            display: none;
+        }
+
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-message.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .status-message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="system-settings-container">
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-cogs settings-icon"></i>
+                Paramètres du Système
+            </h1>
+            <a href="/" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                retour tableau de bord
+            </a>
+        </div>
+
+        <div class="config-info">
+            <h3><i class="fas fa-info-circle"></i> Statut de la Configuration</h3>
+            <div id="configStatus">Chargement de la configuration système...</div>
+        </div>
+
+                <div class="settings-tabs">
+            <button class="tab-button active" data-tab="security">
+                <i class="fas fa-shield-alt"></i> Sécurité
+            </button>
+            <button class="tab-button" data-tab="users">
+                <i class="fas fa-users"></i> Gestion des Utilisateurs
+            </button>
+            <button class="tab-button" data-tab="members">
+                <i class="fas fa-user-friends"></i> Gestion des Membres
+            </button>
+            <button class="tab-button" data-tab="application">
+                <i class="fas fa-cog"></i> Application
+            </button>
+            <button class="tab-button" data-tab="business">
+                <i class="fas fa-business-time"></i> Règles Métier
+            </button>
+        </div>
+
+        <div id="statusMessage" class="status-message"></div>
+
+        <!-- Security Settings -->
+        <div id="security" class="settings-section active">
+            <div class="setting-group">
+                <h3 class="group-title">
+                    <i class="fas fa-clock"></i>
+                    Paramètres de Session et Délai d'Expiration
+                </h3>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Délai d'expiration de session (minutes)</div>
+                        <div class="setting-description">Durée avant déconnexion automatique des utilisateurs inactifs</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="number" class="setting-input" id="sessionTimeoutMinutes" min="5" max="480">
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Temps d'avertissement (minutes)</div>
+                        <div class="setting-description">Avertissement avant expiration de la session</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="number" class="setting-input" id="warningTimeoutMinutes" min="1" max="30">
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Nombre max de tentatives de connexion</div>
+                        <div class="setting-description">Nombre d'échecs avant verrouillage du compte</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="number" class="setting-input" id="maxFailedLogins" min="3" max="10">
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Exiger la vérification par email</div>
+                        <div class="setting-description">Les utilisateurs doivent vérifier leur email avant l'accès</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="setting-toggle">
+                            <input type="checkbox" id="requireEmailVerification">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Exiger des mots de passe forts</div>
+                        <div class="setting-description">Appliquer les exigences de complexité des mots de passe</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="setting-toggle">
+                            <input type="checkbox" id="requireStrongPasswords">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Management Settings -->
+        <div id="users" class="settings-section">
+            <div class="setting-group">
+                <h3 class="group-title">
+                    <i class="fas fa-user-plus"></i>
+                    Paramètres d'Inscription
+                </h3>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Rôle utilisateur par défaut</div>
+                        <div class="setting-description">Rôle attribué aux nouveaux utilisateurs</div>
+                    </div>
+                    <div class="setting-control">
+                        <select class="setting-select" id="defaultUserRole">
+                            <option value="user">Utilisateur</option>
+                            <option value="moderator">Modérateur</option>
+                            <option value="admin">Administrateur</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Autoriser l'auto-inscription</div>
+                        <div class="setting-description">Les utilisateurs peuvent s'inscrire eux-mêmes</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="setting-toggle">
+                            <input type="checkbox" id="allowSelfRegistration">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Exiger l'approbation d'un administrateur</div>
+                        <div class="setting-description">Les nouveaux utilisateurs nécessitent une approbation d'administrateur</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="setting-toggle">
+                            <input type="checkbox" id="requireAdminApproval">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Member Management Settings -->
+        <div id="members" class="settings-section">
+            <div class="setting-group">
+                <h3 class="group-title">
+                    <i class="fas fa-user-cog"></i>
+                    Permissions d'Accès aux Membres
+                </h3>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Autoriser la suppression de membres</div>
+                        <div class="setting-description">Les utilisateurs peuvent supprimer les enregistrements de membres</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="setting-toggle">
+                            <input type="checkbox" id="allowMemberDeletion">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Autoriser l'importation Excel</div>
+                        <div class="setting-description">Les utilisateurs peuvent importer des membres depuis des fichiers Excel</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="setting-toggle">
+                            <input type="checkbox" id="allowExcelImport">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Autoriser la modification de membres</div>
+                        <div class="setting-description">Les utilisateurs peuvent modifier les informations de membres</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="setting-toggle">
+                            <input type="checkbox" id="allowMemberModification">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Autoriser la création de membres</div>
+                        <div class="setting-description">Les utilisateurs peuvent créer de nouveaux enregistrements de membres</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="setting-toggle">
+                            <input type="checkbox" id="allowMemberCreation">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Autoriser la gestion des avatars</div>
+                        <div class="setting-description">Les utilisateurs peuvent télécharger/modifier les avatars des membres</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="setting-toggle">
+                            <input type="checkbox" id="allowAvatarManagement">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Autoriser l'accès à la vue détaillée</div>
+                        <div class="setting-description">Les utilisateurs peuvent accéder aux informations détaillées des membres</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="setting-toggle">
+                            <input type="checkbox" id="allowDetailedViewAccess">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <h3 class="group-title">
+                    <i class="fas fa-users-cog"></i>
+                    Limites de Gestion des Membres
+                </h3>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Exiger une approbation pour suppression</div>
+                        <div class="setting-description">Les suppressions de membres nécessitent une approbation d'administrateur</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="setting-toggle">
+                            <input type="checkbox" id="requireApprovalForDeletion">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Nombre max de membres par utilisateur</div>
+                        <div class="setting-description">Nombre maximum de membres qu'un utilisateur peut gérer</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="number" class="setting-input" id="maxMembersPerUser" min="1" max="10000">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Application Settings -->
+        <div id="application" class="settings-section">
+            <div class="setting-group">
+                <h3 class="group-title">
+                    <i class="fas fa-server"></i>
+                    Paramètres Système
+                </h3>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Mode débogage</div>
+                        <div class="setting-description">Activer la journalisation détaillée et les fonctionnalités de débogage</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="setting-toggle">
+                            <input type="checkbox" id="enableDebugMode">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Autoriser les téléchargements d'avatars</div>
+                        <div class="setting-description">Les utilisateurs peuvent télécharger des photos de profil</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="setting-toggle">
+                            <input type="checkbox" id="allowAvatarUploads">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Taille max d'avatar (MB)</div>
+                        <div class="setting-description">Taille maximale de fichier pour les téléchargements d'avatar</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="number" class="setting-input" id="maxAvatarSizeMB" min="1" max="10" step="0.5">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Business Rules Settings -->
+        <div id="business" class="settings-section">
+            <div class="setting-group">
+                <h3 class="group-title">
+                    <i class="fas fa-calendar-alt"></i>
+                    Paramètres d'Événements
+                </h3>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Autoriser la création d'événements</div>
+                        <div class="setting-description">Les utilisateurs peuvent créer des événements</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="setting-toggle">
+                            <input type="checkbox" id="allowEventCreation">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Nombre max d'événements par utilisateur</div>
+                        <div class="setting-description">Nombre maximum d'événements qu'un utilisateur peut créer</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="number" class="setting-input" id="maxEventsPerUser" min="1" max="100">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Save Section -->
+        <div class="save-section">
+            <button class="btn btn-primary" id="saveSettings">
+                <i class="fas fa-save"></i>
+                Enregistrer tous les paramètres
+            </button>
+            <button class="btn btn-secondary" id="reloadSettings">
+                <i class="fas fa-sync"></i>
+                Recharger les paramètres
+            </button>
+            <button class="btn btn-danger" id="resetSettings">
+                <i class="fas fa-undo"></i>
+                Remettre aux valeurs par défaut
+            </button>
+        </div>
+    </div>
+
+    <script src="comprehensive-logout.js"></script>
+    <script src="navigation.js"></script>
+    <script src="system-settings.js"></script>
+</body>
+</html>

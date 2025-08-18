@@ -1,0 +1,319 @@
+/* PWA Mobile Enhancement Styles */
+
+/* Touch-friendly buttons and controls */
+@media (max-width: 768px) {
+  /* Ensure minimum touch target size */
+  button, 
+  .btn, 
+  .button,
+  input[type="submit"],
+  input[type="button"],
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 12px 16px;
+    font-size: 16px;
+    border-radius: 8px;
+  }
+
+  /* Larger input fields for mobile */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="tel"],
+  input[type="number"],
+  select,
+  textarea {
+    min-height: 44px;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+  }
+
+  /* Prevent zoom on input focus */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+
+  /* Mobile-friendly tables */
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table {
+    min-width: 600px;
+  }
+
+  /* Card-based layout for mobile */
+  .mobile-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    margin: 12px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  /* Mobile navigation */
+  .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+
+  .nav-tabs {
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .nav-tabs .nav-link {
+    display: inline-block;
+    min-width: 80px;
+  }
+
+  /* Mobile-friendly modals */
+  .modal-dialog {
+    margin: 10px;
+    max-width: calc(100vw - 20px);
+  }
+
+  .modal-body {
+    padding: 20px;
+  }
+
+  /* Touch-friendly dropdowns */
+  .dropdown-menu {
+    font-size: 18px;
+    min-width: 200px;
+  }
+
+  .dropdown-item {
+    padding: 12px 16px;
+  }
+
+  /* Mobile spacing */
+  .container, 
+  .container-fluid {
+    padding: 15px;
+  }
+
+  .row {
+    margin: 0 -10px;
+  }
+
+  .col, .col-* {
+    padding: 0 10px;
+  }
+
+  /* Mobile-friendly alerts */
+  .alert {
+    border-radius: 8px;
+    padding: 16px;
+    font-size: 16px;
+  }
+
+  /* Better mobile forms */
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-label {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  /* Mobile-specific utility classes */
+  .mobile-only {
+    display: block !important;
+  }
+
+  .desktop-only {
+    display: none !important;
+  }
+
+  /* Pull-to-refresh indicator */
+  .pull-to-refresh {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+    font-size: 14px;
+  }
+
+  /* Loading states */
+  .loading {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  .spinner {
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #0066cc;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Mobile-friendly pagination */
+  .pagination {
+    justify-content: center;
+  }
+
+  .page-link {
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Swipe indicators */
+  .swipe-hint {
+    color: #999;
+    font-size: 12px;
+    text-align: center;
+    margin: 10px 0;
+  }
+
+  .swipe-hint::after {
+    content: " 👆 Swipe";
+  }
+}
+
+/* PWA-specific styles */
+@media (display-mode: standalone) {
+  /* Styles when app is in standalone mode */
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  .navbar {
+    padding-top: calc(12px + env(safe-area-inset-top));
+  }
+
+  .pwa-standalone {
+    display: block;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #1a1a1a;
+    --text-color: #ffffff;
+    --card-bg: #2d2d2d;
+    --border-color: #404040;
+  }
+
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+  }
+
+  .mobile-card,
+  .modal-content {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+  }
+
+  input, select, textarea {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border-color: var(--border-color);
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  button, .btn {
+    border: 2px solid currentColor;
+  }
+
+  .mobile-card {
+    border: 1px solid #333;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* iOS specific styles */
+@supports (-webkit-appearance: none) and (stroke-color: transparent) {
+  /* iOS Safari specific styles */
+  .ios-safe-area {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  input {
+    -webkit-appearance: none;
+    border-radius: 8px;
+  }
+
+  button {
+    -webkit-appearance: none;
+  }
+}
+
+/* Android specific styles */
+@media (max-width: 768px) and (orientation: portrait) {
+  /* Android Chrome specific adjustments */
+  .android-nav {
+    padding-bottom: 8px;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-height: 500px) and (orientation: landscape) {
+  .navbar {
+    min-height: 50px;
+  }
+
+  .modal-dialog {
+    max-height: 90vh;
+  }
+
+  .modal-body {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+}
+
+/* Very small screens (older phones) */
+@media (max-width: 360px) {
+  .container {
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  .btn-group .btn {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+}

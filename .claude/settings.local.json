@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git clone:*)",
+      "Bash(git checkout:*)",
+      "Bash(npm install)",
+      "Bash(rm:*)",
+      "Bash(mkdir:*)",
+      "Bash(copy:*)",
+      "Bash(cp:*)",
+      "Bash(where firebase)",
+      "Bash(firebase deploy:*)",
+      "Bash(firebase --version)",
+      "Bash(firebase projects:list:*)",
+      "Bash(firebase use:*)",
+      "Bash(node:*)",
+      "Bash(.pwa-deploy.bat)",
+      "WebFetch(domain:localhost)",
+      "Bash(firebase emulators:start:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
