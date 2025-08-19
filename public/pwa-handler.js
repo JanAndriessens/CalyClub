@@ -49,8 +49,8 @@
     e.preventDefault();
     // Stash the event so it can be triggered later
     deferredPrompt = e;
-    // Show install button
-    showInstallPromotion();
+    // DISABLED: Don't show install button automatically
+    // showInstallPromotion();
   });
 
   function showInstallPromotion() {
@@ -290,8 +290,8 @@
     }
   }
 
-  // Show iOS instructions on load
-  window.addEventListener('load', showiOSInstallInstructions);
+  // DISABLED: Show iOS instructions on load
+  // window.addEventListener('load', showiOSInstallInstructions);
 
   // Track installation
   window.addEventListener('appinstalled', () => {

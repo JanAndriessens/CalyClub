@@ -274,12 +274,12 @@ class NotificationManager {
     }
 
     if (this.permission === 'granted') {
-      this.showNotification('Test CalyBase', {
+      this.showNotification('Test CalyClub', {
         body: 'Les notifications fonctionnent !',
         tag: 'test'
       });
     } else {
-      this.showInAppNotification('Test CalyBase', 'Notification de test (in-app)', 'info');
+      this.showInAppNotification('Test CalyClub', 'Notification de test (in-app)', 'info');
     }
   }
 }
