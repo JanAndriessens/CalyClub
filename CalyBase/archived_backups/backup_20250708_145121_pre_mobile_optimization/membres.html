@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CalyBase - Membres</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- CRITICAL: Page Protection (MUST load first) -->
+    <script src="page-protection.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    <!-- SheetJS pour la lecture des fichiers Excel -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <!-- Encoding.js pour la gestion des caractères spéciaux -->
+    <script src="https://cdn.jsdelivr.net/npm/encoding-japanese@2.0.0/encoding.min.js"></script>
+    <style>
+        /* ... existing styles ... */
+
+        .member-count {
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        .member-count span {
+            font-weight: bold;
+            color: #2196F3;
+        }
+
+        .error-message {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #ff4444;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            z-index: 9999;
+        }
+
+        /* Avatar styling for members table */
+        .avatar-cell {
+            text-align: center;
+            padding: 0.5rem;
+            width: 60px;
+        }
+
+        .member-table-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #e0e0e0;
+            transition: transform 0.2s ease;
+        }
+
+        .member-table-avatar:hover {
+            transform: scale(1.1);
+            border-color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">CalyBase</div>
+        <div class="nav-links">
+            <a href="/">Accueil</a>
+            <a href="/membres.html" class="active">Membres</a>
+            <a href="/events.html">Événements</a>
+            <a href="/login.html" id="authLink">Déconnexion</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="membres-section">
+            <div class="membres-header">
+                <h1>Gestion des Membres</h1>
+                <div class="membres-actions">
+                    <button id="importExcelBtn" class="action-button">Importer Excel</button>
+                    <button id="deleteAllBtn" class="action-button danger">Supprimer tous les membres</button>
+                    <button id="updateMedicalBtn" class="action-button">Mettre à jour Medical</button>
+                </div>
+            </div>
+            
+            <div class="members-controls">
+                <div class="search-container">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Rechercher un membre...">
+                </div>
+                <input type="file" id="excelFileInput" accept=".xls,.xlsx" style="display: none;">
+            </div>
+
+            <div class="member-count">
+                Nombre de membres: <span id="memberCount">0</span>
+            </div>
+
+            <div class="membres-table-container">
+                <table class="membres-table">
+                    <thead>
+                        <tr>
+                            <th>Avatar</th>
+                            <th>Nom</th>
+                            <th>Prénom</th>
+                            <th>Medical</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="membresTableBody">
+                        <!-- Les données seront insérées ici dynamiquement -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 CalyBase. Tous droits réservés.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Handle script loading errors
+        window.addEventListener('error', function(e) {
+            if (e.target.tagName === 'SCRIPT') {
+                console.error('Script loading error:', e);
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'error-message';
+                errorMessage.textContent = 'Erreur de chargement des ressources. Veuillez rafraîchir la page.';
+                document.body.appendChild(errorMessage);
+            }
+        }, true);
+
+        // Check if Firebase is loaded
+        window.addEventListener('load', function() {
+            if (typeof firebase === 'undefined') {
+                console.error('Firebase not loaded');
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'error-message';
+                errorMessage.textContent = 'Erreur de chargement de Firebase. Veuillez rafraîchir la page.';
+                document.body.appendChild(errorMessage);
+            }
+        });
+    </script>
+    <script src="firebase-config.js"></script>
+    <script src="clear-cache.js"></script>
+    <script src="firebase-app.js"></script>
+    <script src="system-config.js"></script>
+    <script src="member-permissions.js"></script>
+    <script src="auth-guard.js"></script>
+    <script src="simple-logout.js"></script>
+    <script src="membres.js"></script>
+    
+    <!-- Username Display -->
+    <script>
+        async function showUsernameUnderLogo() {
+            if (!window.auth?.currentUser) {
+                setTimeout(showUsernameUnderLogo, 500);
+                return;
+            }
+            
+            const logo = document.querySelector('.logo');
+            if (!logo || logo.querySelector('.username-display')) return;
+            
+            const user = window.auth.currentUser;
+            let displayName = user.email;
+            
+            try {
+                if (window.db) {
+                    const userDoc = await window.db.collection('users').doc(user.uid).get();
+                    if (userDoc.exists && userDoc.data().username) {
+                        displayName = userDoc.data().username;
+                    }
+                }
+            } catch (error) {
+                console.log('Using email as display name');
+            }
+            
+            const container = document.createElement('div');
+            container.style.display = 'flex';
+            container.style.flexDirection = 'column';
+            container.style.alignItems = 'flex-start';
+            
+            const title = document.createElement('div');
+            title.textContent = 'CalyBase';
+            title.style.fontSize = '1.5rem';
+            title.style.fontWeight = 'bold';
+            title.style.color = '#4a90e2';
+            
+            const username = document.createElement('div');
+            username.className = 'username-display';
+            username.textContent = displayName;
+            username.style.fontSize = '11px';
+            username.style.color = 'rgba(74, 144, 226, 0.6)';
+            username.style.marginTop = '2px';
+            username.style.fontWeight = 'normal';
+            
+            logo.innerHTML = '';
+            container.appendChild(title);
+            container.appendChild(username);
+            logo.appendChild(container);
+        }
+        
+        window.addEventListener('load', () => setTimeout(showUsernameUnderLogo, 1000));
+    </script>
+</body>
+</html> 

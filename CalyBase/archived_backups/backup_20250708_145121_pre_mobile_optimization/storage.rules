@@ -1,0 +1,51 @@
+rules_version = '2';
+
+// Craft rules based on data in your Firestore database
+// allow write: if firestore.get(
+//    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function hasRole(role) {
+      return isAuthenticated() && 
+             request.auth.token.role == role;
+    }
+    
+    function isValidOrigin() {
+      return request.origin.matches('http://localhost:3001|https://calybase.web.app|https://calybase.firebaseapp.com');
+    }
+    
+    // Rules for avatars (using lifrasID_timestamp pattern)
+    match /avatars/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isValidImageOrDelete();
+      allow delete: if isAuthenticated();
+    }
+    
+    // Helper function for image validation or delete operations
+    function isValidImageOrDelete() {
+      return request.resource == null || // Delete operation
+             (request.resource.contentType.matches('image/.*') && 
+              request.resource.size < 5 * 1024 * 1024); // 5MB limit for uploads
+    }
+    
+    // Rules for member documents
+    match /documents/{userId}/{fileName} {
+      allow read: if isAuthenticated() 
+                  && (hasRole('admin') || request.auth.uid == userId);
+      allow write: if isAuthenticated() 
+                   && (hasRole('admin') || request.auth.uid == userId)
+                   && request.resource.size < 10 * 1024 * 1024 // 10MB limit
+                   && isValidOrigin();
+    }
+    
+    // Default rules for all other paths
+    match /{allPaths=**} {
+      allow read, write: if false; // Deny access by default
+    }
+  }
+}

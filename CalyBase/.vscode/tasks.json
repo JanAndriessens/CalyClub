@@ -1,0 +1,189 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "🚀 Quick Deploy",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "deploy:quick"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": [],
+      "detail": "Quick deployment: add, commit with auto-message, and push to trigger Vercel deploy",
+      "icon": {
+        "id": "rocket",
+        "color": "terminal.ansiGreen"
+      }
+    },
+    {
+      "label": "📝 Deploy with Message",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "deploy:message"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": [],
+      "detail": "Interactive deployment: add, commit with custom message, and push",
+      "icon": {
+        "id": "edit",
+        "color": "terminal.ansiYellow"
+      }
+    },
+    {
+      "label": "✅ Deploy Verification",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "deploy:verify"],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Check git status and verify deployment status",
+      "icon": {
+        "id": "check",
+        "color": "terminal.ansiBlue"
+      }
+    },
+    {
+      "label": "🔄 Auto Deploy (Watch Mode)",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "deploy:watch"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "isBackground": true,
+      "problemMatcher": [],
+      "detail": "Start file watcher for automatic deployment on changes",
+      "icon": {
+        "id": "eye",
+        "color": "terminal.ansiMagenta"
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      }
+    },
+    {
+      "label": "🌐 Open Live Site",
+      "type": "shell",
+      "command": "open",
+      "args": ["https://caly-club.vercel.app/"],
+      "group": "test",
+      "presentation": {
+        "echo": false,
+        "reveal": "never",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "detail": "Open CalyClub live site in browser",
+      "icon": {
+        "id": "globe",
+        "color": "terminal.ansiCyan"
+      }
+    },
+    {
+      "label": "📊 Git Status",
+      "type": "shell",
+      "command": "git",
+      "args": ["status", "--porcelain"],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Show current git status for deployment readiness",
+      "icon": {
+        "id": "git-branch",
+        "color": "terminal.ansiWhite"
+      }
+    },
+    {
+      "label": "🔧 Setup Deploy Hooks",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "setup:hooks"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": [],
+      "detail": "Install git hooks for automatic deployment triggers",
+      "icon": {
+        "id": "settings-gear",
+        "color": "terminal.ansiRed"
+      }
+    },
+    {
+      "label": "🏃‍♂️ Emergency Deploy",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "-c",
+        "git add . && git commit -m 'HOTFIX: Emergency deployment - $(date)' && git push origin main && echo '🚨 Emergency deployment initiated!'"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "Emergency deployment: commit all changes and deploy immediately",
+      "icon": {
+        "id": "alert",
+        "color": "terminal.ansiRed"
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "commitMessage",
+      "description": "Enter commit message for deployment",
+      "default": "Update: $(date +%Y-%m-%d) deployment",
+      "type": "promptString"
+    }
+  ]
+}

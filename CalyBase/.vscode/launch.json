@@ -1,0 +1,38 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "🚀 Debug CalyClub Server",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/index.js",
+      "console": "integratedTerminal",
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "restart": true,
+      "runtimeArgs": ["--inspect"],
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
+    },
+    {
+      "name": "🔧 Debug Deployment Script",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/optimize.js",
+      "console": "integratedTerminal",
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
+    },
+    {
+      "name": "🌐 Launch Live Site",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/.bin/open-cli",
+      "args": ["https://caly-base.vercel.app/"],
+      "console": "integratedTerminal"
+    }
+  ]
+}

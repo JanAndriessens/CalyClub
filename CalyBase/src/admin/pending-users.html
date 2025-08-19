@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CalyBase - Utilisateurs en Attente</title>
+    <link rel="stylesheet" href="../styles/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <header class="admin-header">
+            <h1>Utilisateurs en Attente</h1>
+            <nav class="admin-nav">
+                <a href="/admin/dashboard.html">Tableau de bord</a>
+                <a href="/admin/users.html">Utilisateurs</a>
+                <a href="/admin/pending-users.html" class="active">En attente</a>
+                <a href="/admin/settings.html">Paramètres</a>
+            </nav>
+        </header>
+
+        <main class="admin-content">
+            <div class="pending-users-container">
+                <div id="pendingUsersList">
+                    <!-- Pending users will be loaded here -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for rejection reason -->
+    <div id="rejectModal" class="modal">
+        <div class="modal-content">
+            <h2>Raison du rejet</h2>
+            <textarea id="rejectionReason" placeholder="Entrez la raison du rejet..."></textarea>
+            <div class="modal-actions">
+                <button id="confirmReject" class="btn-danger">Rejeter</button>
+                <button id="cancelReject" class="btn-secondary">Annuler</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { authService } from '../auth/auth.service.js';
+        import { auth } from '../auth/firebase.config.js';
+
+        const pendingUsersList = document.getElementById('pendingUsersList');
+        const rejectModal = document.getElementById('rejectModal');
+        const rejectionReason = document.getElementById('rejectionReason');
+        const confirmReject = document.getElementById('confirmReject');
+        const cancelReject = document.getElementById('cancelReject');
+
+        let currentUserId = null;
+
+        // Format date to French locale
+        const formatDate = (timestamp) => {
+            if (!timestamp) return 'N/A';
+            const date = timestamp.toDate();
+            return new Intl.DateTimeFormat('fr-FR', {
+                dateStyle: 'medium',
+                timeStyle: 'short'
+            }).format(date);
+        };
+
+        // Load pending users
+        const loadPendingUsers = async () => {
+            try {
+                const pendingUsers = await authService.getPendingUsers();
+                
+                if (pendingUsers.length === 0) {
+                    pendingUsersList.innerHTML = `
+                        <div class="no-pending-users">
+                            <p>Aucun utilisateur en attente d'approbation</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                pendingUsersList.innerHTML = pendingUsers.map(user => `
+                    <div class="pending-user-card">
+                        <div class="user-info">
+                            <h3>${user.email}</h3>
+                            <p>Inscrit le: ${formatDate(user.createdAt)}</p>
+                        </div>
+                        <div class="user-actions">
+                            <button onclick="approveUser('${user.id}')" class="btn-approve">
+                                Approuver
+                            </button>
+                            <button onclick="showRejectModal('${user.id}')" class="btn-reject">
+                                Rejeter
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading pending users:', error);
+                alert('Erreur lors du chargement des utilisateurs en attente');
+            }
+        };
+
+        // Approve user
+        window.approveUser = async (userId) => {
+            try {
+                const adminId = auth.currentUser.uid;
+                await authService.approveUser(userId, adminId);
+                await loadPendingUsers();
+            } catch (error) {
+                console.error('Error approving user:', error);
+                alert('Erreur lors de l\'approbation de l\'utilisateur');
+            }
+        };
+
+        // Show reject modal
+        window.showRejectModal = (userId) => {
+            currentUserId = userId;
+            rejectModal.style.display = 'flex';
+            rejectionReason.value = '';
+        };
+
+        // Handle reject confirmation
+        confirmReject.addEventListener('click', async () => {
+            if (!currentUserId) return;
+
+            try {
+                const reason = rejectionReason.value.trim();
+                if (!reason) {
+                    alert('Veuillez entrer une raison pour le rejet');
+                    return;
+                }
+
+                const adminId = auth.currentUser.uid;
+                await authService.rejectUser(currentUserId, adminId, reason);
+                rejectModal.style.display = 'none';
+                await loadPendingUsers();
+            } catch (error) {
+                console.error('Error rejecting user:', error);
+                alert('Erreur lors du rejet de l\'utilisateur');
+            }
+        });
+
+        // Handle modal cancel
+        cancelReject.addEventListener('click', () => {
+            rejectModal.style.display = 'none';
+            currentUserId = null;
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (event) => {
+            if (event.target === rejectModal) {
+                rejectModal.style.display = 'none';
+                currentUserId = null;
+            }
+        });
+
+        // Initial load
+        loadPendingUsers();
+    </script>
+
+    <style>
+        .pending-users-container {
+            padding: 20px;
+        }
+
+        .pending-user-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info h3 {
+            margin: 0 0 10px 0;
+            color: var(--primary-color);
+        }
+
+        .user-info p {
+            margin: 0;
+            color: #666;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-approve,
+        .btn-reject {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        .btn-approve {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-reject {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-approve:hover,
+        .btn-reject:hover {
+            opacity: 0.9;
+        }
+
+        .no-pending-users {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+        .modal-content textarea {
+            width: 100%;
+            height: 100px;
+            margin: 10px 0;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            resize: vertical;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-secondary:hover {
+            opacity: 0.9;
+        }
+    </style>
+</body>
+</html> 

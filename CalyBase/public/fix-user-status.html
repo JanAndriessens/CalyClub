@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fix User Status - CalyClub</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }
+        .result { margin-top: 20px; padding: 10px; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button { background: #4285f4; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; width: 100%; margin: 10px 0; }
+        button:hover { background: #3367d6; }
+        .code { font-family: monospace; background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Fix User Status - CalyClub</h1>
+    <p>This will check your user document and fix the status field.</p>
+
+    <button onclick="signInAndFix()">Sign In & Fix Status</button>
+    
+    <div id="result"></div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAJHe5b04puLllWJAlqQz9or-Dz4cvs2gU",
+            authDomain: "calyclub-72808.firebaseapp.com",
+            projectId: "calyclub-72808",
+            storageBucket: "calyclub-72808.firebasestorage.app",
+            messagingSenderId: "496335267337",
+            appId: "1:496335267337:web:a92d7f2447ced926243ad8"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        async function signInAndFix() {
+            const resultDiv = document.getElementById('result');
+            
+            try {
+                resultDiv.innerHTML = '<div class="result info">Signing in...</div>';
+                
+                // Sign in with Google
+                const provider = new firebase.auth.GoogleAuthProvider();
+                const result = await auth.signInWithPopup(provider);
+                const user = result.user;
+                
+                // Get current user document
+                const userDocRef = db.collection('users').doc(user.uid);
+                const userDoc = await userDocRef.get();
+                
+                let currentData = {};
+                if (userDoc.exists) {
+                    currentData = userDoc.data();
+                    resultDiv.innerHTML = `
+                        <div class="result info">
+                            <h3>📋 Current User Document</h3>
+                            <div class="code">${JSON.stringify(currentData, null, 2)}</div>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = '<div class="result error">User document not found!</div>';
+                    return;
+                }
+                
+                // Update with correct fields
+                const updatedData = {
+                    email: user.email,
+                    displayName: user.displayName || 'Jan Andriessens',
+                    role: 'admin',
+                    status: 'active',  // This is the key fix!
+                    isApproved: true,
+                    createdAt: currentData.createdAt || firebase.firestore.FieldValue.serverTimestamp(),
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+                    provider: 'google'
+                };
+                
+                await userDocRef.set(updatedData, { merge: true });
+                
+                resultDiv.innerHTML = `
+                    <div class="result success">
+                        <h3>✅ User Status Fixed!</h3>
+                        <p><strong>Email:</strong> ${user.email}</p>
+                        <p><strong>Role:</strong> admin</p>
+                        <p><strong>Status:</strong> active</p>
+                        <p><strong>Approved:</strong> true</p>
+                        <br>
+                        <div class="code">${JSON.stringify(updatedData, null, 2)}</div>
+                        <br>
+                        <p><strong>🎉 You can now log in to CalyClub!</strong></p>
+                        <p><a href="/login.html">🚀 Go to CalyClub Login</a></p>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        <h3>❌ Error</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

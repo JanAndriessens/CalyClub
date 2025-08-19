@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Avatars - CalyClub</title>
+    
+    <!-- DEPLOYMENT VERIFICATION -->
+    <script src="deployment-timestamp.js"></script>
+    
+    <link rel="stylesheet" href="styles.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- CRITICAL: Page Protection (MUST load first) -->
+    <script src="page-protection.js"></script>
+    <!-- System Configuration (REQUIRED for timeout settings) -->
+    <script src="system-config.js"></script>
+    <!-- Firebase SDK v8.10.1 -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo-container">
+            <div class="logo-image">
+                <img src="images/CalypsoDC-VerticPos_rvb.png" alt="CalypsoDC Logo">
+            </div>
+            <div class="logo-text-container">
+                <div class="logo-text">CalyClub</div>
+                <div class="username-text" id="usernameText" style="display: none;"></div>
+            </div>
+        </div>
+        <div class="nav-links">
+            <a href="/">Accueil</a>
+            <a href="/membres.html">Membres</a>
+            <a href="/events.html">Événements</a>
+            <a href="/avatars.html" class="active">Avatars</a>
+            <a href="/login.html" id="authLink">Déconnexion</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section class="avatars-section">
+            <div class="avatars-container">
+                <div class="avatars-header">
+                    <h1>Gestion des Avatars</h1>
+                    <div class="search-container">
+                        <input type="text" id="searchInput" placeholder="Rechercher par LifrasID...">
+                    </div>
+                    <div class="upload-container">
+                        <input type="file" id="avatarFileInput" accept="image/*" style="display: none;">
+                        <button id="uploadAvatarBtn" class="action-button">
+                            <i class="fas fa-upload"></i> Ajouter un avatar
+                        </button>
+                    </div>
+                </div>
+                <div id="avatarsContainer" class="avatars-grid"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 CalyClub. Tous droits réservés.</p>
+    </footer>
+
+    <!-- Firebase Config -->
+    <script src="firebase-config.js"></script>
+    <script src="firebase-app.js"></script>
+    <script src="avatar-utils.js"></script>
+    <script src="comprehensive-logout.js"></script>
+    <script src="navigation.js"></script>
+    <script src="simple-logout.js"></script>
+    <script src="avatars.js"></script>
+</body>
+</html> 

@@ -1,0 +1,4 @@
+Force Vercel deployment - avatar button hover fix deployed
+Timestamp: 2025-07-21 17:46:00
+Commit: cc88671
+Issue: Avatar buttons no longer scale on hover - they only change color

@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>CalyBase - Gestion des Utilisateurs</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <!-- CRITICAL: Page Protection (MUST load first) -->
+    <script src="page-protection.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <!-- System Configuration -->
+    <script src="system-config.js"></script>
+    <style>
+        .user-management-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .page-title {
+            font-size: 2rem;
+            color: var(--secondary-color);
+            margin: 0;
+            margin-left: 1rem;
+        }
+
+        .crown-icon {
+            font-size: 2rem;
+            color: #ffd700;
+        }
+
+        .back-button {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: #1565c0;
+            text-decoration: none;
+            color: white;
+        }
+
+        .back-button i {
+            margin-right: 0.5rem;
+        }
+
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border-left: 4px solid;
+        }
+
+        .stat-card.total { border-left-color: #4a90e2; }
+        .stat-card.pending { border-left-color: #f39c12; }
+        .stat-card.active { border-left-color: #2ecc71; }
+        .stat-card.suspended { border-left-color: #e74c3c; }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card.total .stat-number { color: #4a90e2; }
+        .stat-card.pending .stat-number { color: #f39c12; }
+        .stat-card.active .stat-number { color: #2ecc71; }
+        .stat-card.suspended .stat-number { color: #e74c3c; }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .section-tabs {
+            display: flex;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .tab-button {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            position: relative;
+            color: #333; /* Fix: Add dark text color for inactive tabs */
+            font-weight: 500;
+        }
+
+        .tab-button:hover {
+            background: #f5f5f5;
+            color: #1976d2; /* Add color change on hover */
+        }
+
+        .tab-button.active {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .users-filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .search-input, .filter-select {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .users-table th,
+        .users-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .users-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+
+        .users-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-badge.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-badge.active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.suspended {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .role-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .role-badge.admin {
+            background: #667eea;
+            color: white;
+        }
+
+        .role-badge.user {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .btn i {
+            margin-right: 0.25rem;
+        }
+
+        .btn-approve {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .btn-approve:hover {
+            background: #27ae60;
+        }
+
+        .btn-reject {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-reject:hover {
+            background: #c0392b;
+        }
+
+        .btn-suspend {
+            background: #f39c12;
+            color: white;
+        }
+
+        .btn-suspend:hover {
+            background: #e67e22;
+        }
+
+        .btn-edit {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #2980b9;
+        }
+
+        .pending-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #f39c12;
+        }
+
+        .pending-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .pending-email {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+
+        .pending-date {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .pending-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 10% auto;
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .modal-title {
+            margin: 0;
+            color: var(--secondary-color);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        @media (max-width: 768px) {
+            .user-management-container {
+                padding: 1rem;
+            }
+
+            .stats-summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .users-table {
+                font-size: 0.9rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">CalyBase</div>
+        <div class="nav-links">
+            <a href="/">Accueil</a>
+            <a href="/membres.html">Membres</a>
+            <a href="/events.html">Événements</a>
+            <a href="#" id="authLink" class="logout-link" style="color: #ff4444; font-weight: bold;">Déconnexion</a>
+        </div>
+    </nav>
+
+    <!-- User Management Content -->
+    <div class="user-management-container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <a href="/index.html" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                Retour au tableau de bord
+            </a>
+            <a href="/system-settings.html" class="btn btn-primary" style="padding: 0.75rem 1.5rem; background: var(--primary-color); color: white; text-decoration: none; border-radius: 6px;">
+                <i class="fas fa-cogs"></i>
+                Paramètres Système
+            </a>
+        </div>
+
+        <div class="page-header">
+            <i class="fas fa-crown crown-icon"></i>
+            <h1 class="page-title">Gestion des Utilisateurs</h1>
+        </div>
+
+        <!-- Statistics Summary -->
+        <div class="stats-summary">
+            <div class="stat-card total">
+                <div class="stat-number" id="totalUsersCount">-</div>
+                <div class="stat-label">Total Utilisateurs</div>
+            </div>
+            <div class="stat-card pending">
+                <div class="stat-number" id="pendingUsersCount">-</div>
+                <div class="stat-label">En Attente</div>
+            </div>
+            <div class="stat-card active">
+                <div class="stat-number" id="activeUsersCount">-</div>
+                <div class="stat-label">Actifs</div>
+            </div>
+            <div class="stat-card suspended">
+                <div class="stat-number" id="suspendedUsersCount">-</div>
+                <div class="stat-label">Suspendus</div>
+            </div>
+        </div>
+
+        <!-- Section Tabs -->
+        <div class="section-tabs">
+            <button class="tab-button active" data-tab="pending">
+                <i class="fas fa-clock"></i>
+                Demandes en Attente
+            </button>
+            <button class="tab-button" data-tab="users">
+                <i class="fas fa-users"></i>
+                Tous les Utilisateurs
+            </button>
+            <button class="tab-button" data-tab="activity">
+                <i class="fas fa-chart-line"></i>
+                Activité
+            </button>
+        </div>
+
+        <!-- Pending Users Tab -->
+        <div id="pending-tab" class="tab-content active">
+            <h3><i class="fas fa-clock"></i> Demandes d'accès en attente</h3>
+            <p style="color: #666; margin-bottom: 1.5rem;">
+                Approuvez ou refusez les demandes d'accès à la base de données CalyBase.
+            </p>
+            <div id="pendingUsersList">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i> Chargement des demandes...
+                </div>
+            </div>
+        </div>
+
+        <!-- All Users Tab -->
+        <div id="users-tab" class="tab-content">
+            <div class="users-filters">
+                <input type="text" id="usersSearchInput" class="search-input" placeholder="Rechercher par nom d'utilisateur ou email...">
+                <select id="roleFilter" class="filter-select">
+                    <option value="">Tous les rôles</option>
+                    <option value="admin">Administrateur</option>
+                    <option value="user">Utilisateur</option>
+                </select>
+                <select id="statusFilter" class="filter-select">
+                    <option value="">Tous les statuts</option>
+                    <option value="active">Actif</option>
+                    <option value="pending">En attente</option>
+                    <option value="suspended">Suspendu</option>
+                </select>
+            </div>
+
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>Nom d'utilisateur</th>
+                        <th>Email</th>
+                        <th>Rôle</th>
+                        <th>Statut</th>
+                        <th>Inscription</th>
+                        <th>Dernière connexion</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <tr>
+                        <td colspan="7" class="loading-spinner">
+                            <i class="fas fa-spinner fa-spin"></i> Chargement des utilisateurs...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Activity Tab -->
+        <div id="activity-tab" class="tab-content">
+            <h3><i class="fas fa-chart-line"></i> Activité des utilisateurs</h3>
+            <div id="activityContent">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i> Chargement de l'activité...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div id="editUserModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Modifier l'utilisateur</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="editUserForm">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="editUserEmail" class="form-input" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Nom d'utilisateur</label>
+                    <input type="text" id="editUserUsername" class="form-input" 
+                           pattern="^[a-zA-Z0-9_]{3,20}$"
+                           title="Nom d'utilisateur: 3-20 caractères, lettres, chiffres et underscores uniquement"
+                           placeholder="Entrez un nom d'utilisateur (optionnel)">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Rôle</label>
+                    <select id="editUserRole" class="form-select">
+                        <option value="user">Utilisateur</option>
+                        <option value="admin">Administrateur</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Statut</label>
+                    <select id="editUserStatus" class="form-select">
+                        <option value="active">Actif</option>
+                        <option value="pending">En attente</option>
+                        <option value="suspended">Suspendu</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-reject close-modal">Annuler</button>
+                    <button type="submit" class="btn btn-approve">Sauvegarder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Rejection Reason Modal -->
+    <div id="rejectionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Raison du refus</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Pourquoi refusez-vous cette demande ?</label>
+                <textarea id="rejectionReason" class="form-textarea" placeholder="Entrez la raison du refus..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-edit close-modal">Annuler</button>
+                <button type="button" id="confirmRejection" class="btn btn-reject">Confirmer le refus</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="firebase-config.js"></script>
+    <script src="clear-cache.js"></script>
+    <script src="firebase-app.js"></script>
+    <script src="auth-guard.js"></script>
+    <script src="navigation.js"></script>
+    <script src="simple-logout.js"></script>
+    <script src="user-management.js?v=20250704_180000"></script>
+    
+    <!-- Username Display Script -->
+    <script>
+        // Simple username display functionality
+        async function updateUsernameDisplay() {
+            console.log('🔧 Updating username display...');
+            
+            // Wait for Firebase auth to be ready
+            if (!window.auth || !window.auth.currentUser) {
+                console.log('⏳ Waiting for authentication...');
+                setTimeout(updateUsernameDisplay, 500);
+                return;
+            }
+            
+            const user = window.auth.currentUser;
+            console.log('👤 Current user:', user.email);
+            
+            const logo = document.querySelector('.logo');
+            if (!logo) {
+                console.log('❌ Logo element not found');
+                return;
+            }
+            
+            // Remove existing username display
+            const existingDisplay = document.querySelector('.username-display');
+            if (existingDisplay) {
+                existingDisplay.remove();
+            }
+            
+            let displayName = user.email; // Default fallback
+            
+            // Try to get username from Firestore
+            try {
+                if (window.db) {
+                    const userDoc = await window.db.collection('users').doc(user.uid).get();
+                    if (userDoc.exists) {
+                        const userData = userDoc.data();
+                        if (userData.username && userData.username.trim()) {
+                            displayName = userData.username;
+                            console.log('📧 Using username:', displayName);
+                        } else {
+                            console.log('📧 No username, using email');
+                        }
+                    }
+                }
+            } catch (error) {
+                console.log('⚠️ Could not fetch username:', error.message);
+            }
+            
+            // Create the display structure
+            if (!logo.querySelector('.logo-container')) {
+                // First time - restructure the logo
+                const logoText = logo.textContent;
+                logo.innerHTML = '';
+                
+                const container = document.createElement('div');
+                container.style.display = 'flex';
+                container.style.flexDirection = 'column';
+                container.style.alignItems = 'flex-start';
+                
+                const title = document.createElement('div');
+                title.textContent = logoText;
+                title.style.fontSize = '1.5rem';
+                title.style.fontWeight = 'bold';
+                title.style.color = '#4a90e2';
+                title.style.lineHeight = '1';
+                
+                const username = document.createElement('div');
+                username.className = 'username-display';
+                username.textContent = displayName;
+                username.style.fontSize = '11px';
+                username.style.color = 'rgba(74, 144, 226, 0.6)';
+                username.style.marginTop = '2px';
+                username.style.fontWeight = 'normal';
+                username.style.lineHeight = '1';
+                
+                container.appendChild(title);
+                container.appendChild(username);
+                logo.appendChild(container);
+                
+                console.log('✅ Username display created:', displayName);
+            } else {
+                // Update existing display
+                const usernameDiv = logo.querySelector('.username-display');
+                if (usernameDiv) {
+                    usernameDiv.textContent = displayName;
+                    console.log('✅ Username updated:', displayName);
+                }
+            }
+        }
+        
+        // Test function
+        window.testUsername = function() {
+            console.log('🧪 Testing username display...');
+            updateUsernameDisplay();
+        };
+        
+        // Start trying to update the display when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Username display: DOM ready, starting...');
+            updateUsernameDisplay();
+        });
+        
+        // Also try when the page loads completely
+        window.addEventListener('load', function() {
+            console.log('🚀 Username display: Page loaded, trying again...');
+            setTimeout(updateUsernameDisplay, 1000);
+        });
+    </script>
+</body>
+</html> 

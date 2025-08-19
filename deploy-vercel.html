@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CalyClub Deployment Guide</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 40px 20px; 
+            line-height: 1.6;
+        }
+        .step { 
+            background: #f8f9fa; 
+            border-left: 4px solid #0066cc; 
+            padding: 20px; 
+            margin: 20px 0; 
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; border-left-color: #28a745; }
+        .warning { background: #fff3cd; border-left-color: #ffc107; }
+        .code { 
+            background: #e9ecef; 
+            padding: 15px; 
+            border-radius: 4px; 
+            font-family: monospace; 
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        .button {
+            display: inline-block;
+            background: #0066cc;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 10px 10px 10px 0;
+        }
+        .button:hover { background: #0052a3; }
+        h1 { color: #0066cc; }
+        h2 { color: #333; margin-top: 30px; }
+    </style>
+</head>
+<body>
+    <h1>🚀 CalyClub Deployment Guide</h1>
+    <p>Your CalyClub is ready for deployment! Here are the easiest ways to get it online.</p>
+
+    <div class="step success">
+        <h2>✅ Current Status</h2>
+        <p><strong>Firebase:</strong> Already deployed and working!</p>
+        <p><strong>URL:</strong> <a href="https://calyclub-72808.web.app" target="_blank">https://calyclub-72808.web.app</a></p>
+        <p><strong>Structure:</strong> Clean and organized in CalyClub root folder</p>
+        <p><strong>Files:</strong> 114 files committed and ready</p>
+    </div>
+
+    <div class="step">
+        <h2>🎯 Option 1: Create GitHub Repository (Recommended)</h2>
+        <p>This enables automatic Vercel deployments:</p>
+        <ol>
+            <li><a href="https://github.com/new" target="_blank" class="button">Create New GitHub Repo</a></li>
+            <li>Repository name: <code>CalyClub</code></li>
+            <li>Make it <strong>Public</strong></li>
+            <li>Don't initialize with README (we have files already)</li>
+            <li>Click <strong>"Create repository"</strong></li>
+        </ol>
+        
+        <p><strong>Then run these commands in your CalyClub folder:</strong></p>
+        <div class="code">git remote set-url origin https://github.com/YourUsername/CalyClub.git<br>
+git push -u origin master</div>
+        
+        <p><em>Replace "YourUsername" with your actual GitHub username</em></p>
+    </div>
+
+    <div class="step">
+        <h2>🔥 Option 2: Deploy to Vercel Dashboard</h2>
+        <p>Once your GitHub repo is created:</p>
+        <ol>
+            <li><a href="https://vercel.com/new" target="_blank" class="button">Deploy on Vercel</a></li>
+            <li>Click <strong>"Import Git Repository"</strong></li>
+            <li>Select your <strong>CalyClub</strong> repository</li>
+            <li>Configure project:
+                <ul>
+                    <li><strong>Project Name:</strong> calyclub</li>
+                    <li><strong>Framework:</strong> Other</li>
+                    <li><strong>Root Directory:</strong> ./ (default)</li>
+                    <li><strong>Build Command:</strong> (leave empty)</li>
+                    <li><strong>Output Directory:</strong> public</li>
+                </ul>
+            </li>
+            <li>Click <strong>"Deploy"</strong></li>
+        </ol>
+    </div>
+
+    <div class="step warning">
+        <h2>⚡ Option 3: Quick Deploy with Vercel CLI</h2>
+        <p>If you want to try the CLI again:</p>
+        <div class="code">cd "C:\Users\janan\Documents\GitHub\CalyClub"<br>
+npx vercel --yes</div>
+        <p>This bypasses the interactive setup and uses defaults.</p>
+    </div>
+
+    <div class="step">
+        <h2>🌐 Option 4: Alternative Hosting</h2>
+        <p>Your CalyClub can be deployed to other platforms too:</p>
+        <ul>
+            <li><strong>Netlify:</strong> <a href="https://app.netlify.com/drop" target="_blank">Drag & drop deployment</a></li>
+            <li><strong>Surge.sh:</strong> <code>npx surge public/</code></li>
+            <li><strong>GitHub Pages:</strong> Enable in repository settings</li>
+        </ul>
+    </div>
+
+    <div class="step success">
+        <h2>🎉 Expected Results</h2>
+        <p>After successful deployment, you'll have:</p>
+        <ul>
+            <li><strong>Firebase URL:</strong> https://calyclub-72808.web.app</li>
+            <li><strong>Vercel URL:</strong> https://calyclub.vercel.app</li>
+            <li><strong>Custom Domain:</strong> Easy to add in Vercel dashboard</li>
+        </ul>
+        
+        <p><strong>Both URLs will show the same CalyClub application!</strong></p>
+    </div>
+
+    <div class="step">
+        <h2>🔧 Next Steps After Deployment</h2>
+        <ol>
+            <li><strong>Test Login:</strong> Try Google sign-in on both URLs</li>
+            <li><strong>Test File Upload:</strong> Upload an avatar or document</li>
+            <li><strong>Add Custom Domain:</strong> Use your own domain (optional)</li>
+            <li><strong>Set up Monitoring:</strong> Enable Vercel analytics</li>
+            <li><strong>Configure Environment:</strong> Add production environment variables if needed</li>
+        </ol>
+    </div>
+
+    <div class="step warning">
+        <h2>⚠️ Important Notes</h2>
+        <ul>
+            <li><strong>Firebase Config:</strong> Already embedded in files, no env vars needed</li>
+            <li><strong>CORS:</strong> May need to add Vercel domain to Firebase Storage rules</li>
+            <li><strong>Authentication:</strong> Works on both Firebase and Vercel deployments</li>
+            <li><strong>Database:</strong> Same Firestore database for both deployments</li>
+        </ul>
+    </div>
+
+    <script>
+        // Auto-fill GitHub username if possible
+        document.addEventListener('DOMContentLoaded', function() {
+            // You can manually update this with your GitHub username
+            const githubUsername = 'JanAndriessens'; // Change this to your username
+            const codeBlocks = document.querySelectorAll('.code');
+            codeBlocks.forEach(block => {
+                if (block.textContent.includes('YourUsername')) {
+                    block.innerHTML = block.innerHTML.replace('YourUsername', githubUsername);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

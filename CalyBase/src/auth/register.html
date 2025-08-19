@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CalyBase - Inscription</title>
+    <link rel="stylesheet" href="../styles/auth.css">
+    <script src="https://www.google.com/recaptcha/api.js?render=YOUR_RECAPTCHA_SITE_KEY"></script>
+</head>
+<body>
+    <div class="auth-container">
+        <form id="registerForm" class="auth-form">
+            <h1>Inscription</h1>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" name="password" required 
+                       pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+                       title="Le mot de passe doit contenir au moins 8 caractères, dont une majuscule, une minuscule, un chiffre et un caractère spécial">
+                <div class="password-requirements">
+                    <p>Le mot de passe doit contenir :</p>
+                    <ul>
+                        <li id="length">Au moins 8 caractères</li>
+                        <li id="uppercase">Une lettre majuscule</li>
+                        <li id="lowercase">Une lettre minuscule</li>
+                        <li id="number">Un chiffre</li>
+                        <li id="special">Un caractère spécial</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirmer le mot de passe</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" id="registerButton">S'inscrire</button>
+            </div>
+
+            <div class="form-links">
+                <a href="login.html">Déjà un compte ? Connectez-vous ici</a>
+            </div>
+
+            <div id="errorMessage" class="error-message"></div>
+        </form>
+    </div>
+
+    <script type="module">
+        import { register } from './firebase.client.js';
+        
+        const form = document.getElementById('registerForm');
+        const errorMessage = document.getElementById('errorMessage');
+        const password = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirmPassword');
+        
+        // Password strength validation
+        const requirements = {
+            length: /.{8,}/,
+            uppercase: /[A-Z]/,
+            lowercase: /[a-z]/,
+            number: /[0-9]/,
+            special: /[!@#$%^&*(),.?":{}|<>]/
+        };
+        
+        password.addEventListener('input', () => {
+            const value = password.value;
+            Object.keys(requirements).forEach(req => {
+                const element = document.getElementById(req);
+                if (requirements[req].test(value)) {
+                    element.classList.add('met');
+                } else {
+                    element.classList.remove('met');
+                }
+            });
+        });
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (password.value !== confirmPassword.value) {
+                errorMessage.textContent = "Les mots de passe ne correspondent pas";
+                return;
+            }
+            
+            const email = document.getElementById('email').value;
+            
+            try {
+                // Execute reCAPTCHA
+                const recaptchaToken = await grecaptcha.execute('YOUR_RECAPTCHA_SITE_KEY', {action: 'register'});
+                
+                // Attempt registration with reCAPTCHA token in headers
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-recaptcha-token': recaptchaToken
+                    },
+                    body: JSON.stringify({ email, password: password.value })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error);
+                }
+
+                const { user } = await response.json();
+                window.location.href = '/verify-email.html';
+            } catch (error) {
+                errorMessage.textContent = error.message;
+            }
+        });
+    </script>
+</body>
+</html> 

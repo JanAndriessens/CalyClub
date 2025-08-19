@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CalyBase - Connexion</title>
+    <link rel="stylesheet" href="../styles/auth.css">
+    <script src="https://www.google.com/recaptcha/api.js?render=YOUR_RECAPTCHA_SITE_KEY"></script>
+</head>
+<body>
+    <div class="auth-container">
+        <form id="loginForm" class="auth-form">
+            <h1>Connexion</h1>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" id="loginButton">Se connecter</button>
+            </div>
+
+            <div class="form-links">
+                <a href="register.html">Pas encore de compte ? Inscrivez-vous ici</a>
+                <a href="reset-password.html">Mot de passe oublié ?</a>
+            </div>
+
+            <div id="errorMessage" class="error-message"></div>
+        </form>
+    </div>
+
+    <script type="module">
+        import { login } from './firebase.client.js';
+        
+        const form = document.getElementById('loginForm');
+        const errorMessage = document.getElementById('errorMessage');
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                // Execute reCAPTCHA
+                const recaptchaToken = await grecaptcha.execute('YOUR_RECAPTCHA_SITE_KEY', {action: 'login'});
+                
+                // Attempt login with reCAPTCHA token in headers
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-recaptcha-token': recaptchaToken
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error);
+                }
+
+                const { user } = await response.json();
+                window.location.href = '/dashboard.html';
+            } catch (error) {
+                errorMessage.textContent = error.message;
+            }
+        });
+    </script>
+</body>
+</html> 

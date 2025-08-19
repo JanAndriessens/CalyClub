@@ -1,0 +1,46 @@
+[
+  {
+    "key": "cmd+shift+d",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🚀 Quick Deploy",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "cmd+shift+m",
+    "command": "workbench.action.tasks.runTask",
+    "args": "📝 Deploy with Message",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "cmd+shift+v",
+    "command": "workbench.action.tasks.runTask",
+    "args": "✅ Deploy Verification",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "cmd+shift+o",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🌐 Open Live Site",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "cmd+shift+g",
+    "command": "workbench.action.tasks.runTask",
+    "args": "📊 Git Status",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "cmd+shift+e",
+    "command": "workbench.action.tasks.runTask",
+    "args": "🏃‍♂️ Emergency Deploy",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "cmd+k cmd+d",
+    "command": "workbench.action.terminal.new",
+    "args": {
+      "cwd": "${workspaceFolder}",
+      "name": "Deployment Terminal"
+    }
+  }
+]

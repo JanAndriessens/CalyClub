@@ -1,0 +1,85 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "membres",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "nom", "order": "ASCENDING" },
+        { "fieldPath": "prenom", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "membres",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "lifrasID", "order": "ASCENDING" },
+        { "fieldPath": "dateDerniereInscription", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "membres",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "nom", "order": "ASCENDING" },
+        { "fieldPath": "dateDerniereInscription", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "avatars",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "lifrasID", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "role", "order": "ASCENDING" },
+        { "fieldPath": "lastLogin", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "events",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "date", "order": "DESCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "activity_logs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "activity_logs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "action", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "auditLog",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+} 

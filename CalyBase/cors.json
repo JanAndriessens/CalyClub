@@ -1,0 +1,26 @@
+[
+  {
+    "origin": [
+      "http://localhost:3001",
+      "https://calyclub-72808.web.app",
+      "https://calyclub-72808.firebaseapp.com",
+      "https://caly-club.vercel.app"
+    ],
+    "method": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    "maxAgeSeconds": 3600,
+    "responseHeader": [
+      "Content-Type",
+      "Authorization",
+      "Content-Length",
+      "X-Requested-With",
+      "x-goog-resumable",
+      "X-Frame-Options",
+      "X-Content-Type-Options",
+      "Strict-Transport-Security",
+      "X-XSS-Protection",
+      "Access-Control-Allow-Origin",
+      "Access-Control-Allow-Methods",
+      "Access-Control-Allow-Headers"
+    ]
+  }
+] 

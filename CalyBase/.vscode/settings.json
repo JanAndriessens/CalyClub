@@ -1,0 +1,80 @@
+{
+  "// CalyClub Cursor IDE Settings": "Deployment automation and development workflow",
+  
+  "// Auto-save configuration": "Enable auto-save to trigger deployment workflows",
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 2000,
+  
+  "// Git configuration": "Streamlined git workflow for deployment",
+  "git.enableCommitSigning": false,
+  "git.confirmSync": false,
+  "git.autofetch": true,
+  "git.autoStash": true,
+  
+  "// Deployment notifications": "Visual feedback for deployment status",
+  "git.showProgress": true,
+  "git.decorations.enabled": true,
+  
+  "// File associations": "CalyClub specific file handling",
+  "files.associations": {
+    "*.md": "markdown",
+    "firebase.json": "jsonc",
+    "vercel.json": "jsonc",
+    "CLAUDE.md": "markdown"
+  },
+  
+  "// Auto-format on save": "Maintain code quality",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit"
+  },
+  
+  "// Terminal configuration": "Deployment command shortcuts",
+  "terminal.integrated.defaultProfile.osx": "zsh",
+  "terminal.integrated.profiles.osx": {
+    "zsh (deployment)": {
+      "path": "zsh",
+      "args": ["-l", "-c", "echo 'CalyClub Deployment Terminal Ready' && zsh"]
+    }
+  },
+  
+  "// Workspace specific settings": "CalyClub project optimizations",
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "package.json": "package-lock.json, yarn.lock",
+    "firebase.json": "firestore.rules, firestore.indexes.json, storage.rules",
+    "vercel.json": "vercel-*.txt, deploy-*.txt",
+    "README.md": "*.md"
+  },
+  
+  "// Deployment triggers": "Files that should trigger auto-deployment",
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/.git/**": true,
+    "**/dist/**": true,
+    "**/build/**": true
+  },
+  
+  "// Git lens configuration": "Enhanced git visibility for deployment tracking",
+  "gitlens.codeLens.enabled": true,
+  "gitlens.currentLine.enabled": true,
+  "gitlens.hovers.currentLine.over": "line",
+  
+  "// Search and replace": "Deployment-specific search patterns",
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/archived_backups": true,
+    "**/.git": true
+  },
+  
+  "// Task configuration": "Enable task auto-detection",
+  "typescript.preferences.includePackageJsonAutoImports": "auto",
+  "npm.enableScriptExplorer": true,
+  
+  "// Claude Code integration": "Settings for AI-assisted development",
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": false,
+    "strings": true
+  }
+}

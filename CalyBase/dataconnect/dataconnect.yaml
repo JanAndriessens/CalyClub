@@ -1,0 +1,12 @@
+specVersion: "v1"
+serviceId: "CalyClub"
+location: "europe-west1"
+schema:
+  source: "./schema"
+  datasource:
+    postgresql:
+      database: "fdcdb"
+      cloudSql:
+        instanceId: "calyclub-8606"
+      # schemaValidation: "COMPATIBLE"
+connectorDirs: ["./connector"]

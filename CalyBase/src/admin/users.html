@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CalyBase - Gestion des Utilisateurs</title>
+    <link rel="stylesheet" href="../styles/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <header class="admin-header">
+            <h1>Gestion des Utilisateurs</h1>
+            <nav class="admin-nav">
+                <a href="/admin/dashboard.html">Tableau de bord</a>
+                <a href="/admin/users.html" class="active">Utilisateurs</a>
+                <a href="/admin/settings.html">Paramètres</a>
+            </nav>
+        </header>
+
+        <main class="admin-content">
+            <div class="users-filters">
+                <input type="text" id="searchInput" placeholder="Rechercher un utilisateur...">
+                <select id="roleFilter">
+                    <option value="">Tous les rôles</option>
+                    <option value="admin">Admin</option>
+                    <option value="user">Utilisateur</option>
+                </select>
+            </div>
+
+            <div class="users-table-container">
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>Rôle</th>
+                            <th>Date d'inscription</th>
+                            <th>Dernière connexion</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <!-- Users will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { getAuth } from 'firebase-admin/auth';
+        import { getFirestore } from 'firebase-admin/firestore';
+
+        const auth = getAuth();
+        const db = getFirestore();
+        const usersTableBody = document.getElementById('usersTableBody');
+        const searchInput = document.getElementById('searchInput');
+        const roleFilter = document.getElementById('roleFilter');
+
+        // Format date to French locale
+        const formatDate = (timestamp) => {
+            if (!timestamp) return 'Jamais';
+            const date = timestamp.toDate();
+            return new Intl.DateTimeFormat('fr-FR', {
+                dateStyle: 'medium',
+                timeStyle: 'short'
+            }).format(date);
+        };
+
+        // Load users
+        const loadUsers = async () => {
+            try {
+                const usersSnapshot = await db.collection('users').get();
+                const users = [];
+
+                for (const doc of usersSnapshot.docs) {
+                    const userData = doc.data();
+                    const user = await auth.getUserByEmail(userData.email);
+                    
+                    users.push({
+                        ...userData,
+                        uid: doc.id,
+                        emailVerified: user.emailVerified,
+                        disabled: user.disabled
+                    });
+                }
+
+                displayUsers(users);
+            } catch (error) {
+                console.error('Error loading users:', error);
+                alert('Erreur lors du chargement des utilisateurs');
+            }
+        };
+
+        // Display users in table
+        const displayUsers = (users) => {
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedRole = roleFilter.value;
+
+            const filteredUsers = users.filter(user => {
+                const matchesSearch = user.email.toLowerCase().includes(searchTerm);
+                const matchesRole = !selectedRole || user.role === selectedRole;
+                return matchesSearch && matchesRole;
+            });
+
+            usersTableBody.innerHTML = filteredUsers.map(user => `
+                <tr>
+                    <td>${user.email}</td>
+                    <td>${user.role}</td>
+                    <td>${formatDate(user.createdAt)}</td>
+                    <td>${formatDate(user.lastLogin)}</td>
+                    <td>
+                        <span class="status-badge ${user.disabled ? 'disabled' : 'active'}">
+                            ${user.disabled ? 'Désactivé' : 'Actif'}
+                        </span>
+                    </td>
+                    <td>
+                        <button onclick="editUser('${user.uid}')" class="btn-edit">Modifier</button>
+                        <button onclick="toggleUserStatus('${user.uid}', ${!user.disabled})" 
+                                class="btn-${user.disabled ? 'activate' : 'deactivate'}">
+                            ${user.disabled ? 'Activer' : 'Désactiver'}
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        };
+
+        // Event listeners for filters
+        searchInput.addEventListener('input', () => loadUsers());
+        roleFilter.addEventListener('change', () => loadUsers());
+
+        // Initial load
+        loadUsers();
+
+        // Make functions available globally
+        window.editUser = async (uid) => {
+            // TODO: Implement user editing
+            alert('Fonctionnalité à venir');
+        };
+
+        window.toggleUserStatus = async (uid, disable) => {
+            try {
+                await auth.updateUser(uid, { disabled: disable });
+                await loadUsers();
+            } catch (error) {
+                console.error('Error updating user status:', error);
+                alert('Erreur lors de la mise à jour du statut');
+            }
+        };
+    </script>
+</body>
+</html> 

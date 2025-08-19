@@ -1,0 +1,20 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0066cc"/>
+      <stop offset="100%" style="stop-color:#004499"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background with rounded corners -->
+  <rect width="512" height="512" rx="76" ry="76" fill="url(#bg)"/>
+  
+  <!-- Wave pattern (representing water/diving) -->
+  <path d="M0 350 Q128 320 256 350 T512 350 L512 512 L0 512 Z" fill="#0080ff" opacity="0.3"/>
+  
+  <!-- Main text "CB" -->
+  <text x="256" y="280" font-family="Arial, sans-serif" font-size="180" font-weight="bold" text-anchor="middle" fill="white">CB</text>
+  
+  <!-- Subtitle -->
+  <text x="256" y="380" font-family="Arial, sans-serif" font-size="48" text-anchor="middle" fill="white" opacity="0.9">DIVING</text>
+</svg>
