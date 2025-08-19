@@ -17,7 +17,9 @@
       "Bash(.pwa-deploy.bat)",
       "WebFetch(domain:localhost)",
       "Bash(firebase emulators:start:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git push:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": [],
