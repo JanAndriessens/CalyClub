@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Paiements - CalyClub</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0066cc">
+    <style>
+        .payment-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .payment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .payment-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+            overflow-x: auto;
+        }
+
+        .payment-tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .payment-tab.active {
+            color: #0066cc;
+            border-bottom-color: #0066cc;
+            font-weight: 600;
+        }
+
+        .payment-tab:hover {
+            background: #f5f5f5;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Create Payment Form */
+        .payment-form {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #0066cc;
+        }
+
+        .amount-input {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .quick-amounts {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .quick-amount-btn {
+            padding: 8px 16px;
+            background: #f0f0f0;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-amount-btn:hover {
+            background: #0066cc;
+            color: white;
+            border-color: #0066cc;
+        }
+
+        /* QR Code Display */
+        .qr-code-container {
+            text-align: center;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            display: none;
+        }
+
+        .qr-code-container.active {
+            display: block;
+        }
+
+        .qr-code-image {
+            max-width: 256px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+        }
+
+        .qr-code-image img {
+            width: 100%;
+            height: auto;
+        }
+
+        .payment-reference {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0066cc;
+            margin: 15px 0;
+            padding: 10px;
+            background: #f0f8ff;
+            border-radius: 6px;
+        }
+
+        .payment-instructions {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .payment-instructions h4 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .payment-instructions ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .payment-instructions li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+
+        /* Payment History */
+        .payment-history {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .payment-filters {
+            padding: 20px;
+            background: #f9f9f9;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .payment-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .payment-table th {
+            background: #f5f5f5;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .payment-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .payment-table tr:hover {
+            background: #f9f9f9;
+        }
+
+        .payment-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .payment-status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .payment-status.confirmed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .payment-status.failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Statistics */
+        .statistics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .stat-card h3 {
+            margin: 0 0 10px 0;
+            color: #666;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #0066cc;
+            margin: 10px 0;
+        }
+
+        .stat-change {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .stat-change.positive {
+            color: #28a745;
+        }
+
+        .stat-change.negative {
+            color: #dc3545;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .payment-container {
+                padding: 10px;
+            }
+
+            .payment-form {
+                padding: 20px;
+            }
+
+            .payment-table {
+                font-size: 14px;
+            }
+
+            .payment-table th,
+            .payment-table td {
+                padding: 8px;
+            }
+
+            .statistics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .payment-filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+
+            .filter-group select,
+            .filter-group input {
+                flex: 1;
+            }
+        }
+
+        /* iPad Optimization */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .payment-container {
+                padding: 20px;
+            }
+
+            .statistics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Loading State */
+        .loading-spinner {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #0066cc;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .btn-generate {
+            background: #0066cc;
+            color: white;
+        }
+
+        .btn-generate:hover {
+            background: #0052a3;
+        }
+
+        .btn-download {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-download:hover {
+            background: #218838;
+        }
+
+        .btn-share {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-share:hover {
+            background: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav id="navigation"></nav>
+
+    <!-- Main Content -->
+    <div class="payment-container">
+        <div class="payment-header">
+            <h1>Gestion des Paiements</h1>
+            <button class="btn btn-primary" onclick="exportPayments()">
+                <span>📥</span> Exporter CSV
+            </button>
+        </div>
+
+        <!-- Payment Tabs -->
+        <div class="payment-tabs">
+            <button class="payment-tab active" onclick="switchTab('create')">
+                Créer un Paiement
+            </button>
+            <button class="payment-tab" onclick="switchTab('history')">
+                Historique
+            </button>
+            <button class="payment-tab" onclick="switchTab('statistics')">
+                Statistiques
+            </button>
+            <button class="payment-tab" onclick="switchTab('pending')">
+                En Attente
+            </button>
+        </div>
+
+        <!-- Tab Content -->
+        <!-- Create Payment Tab -->
+        <div id="create-tab" class="tab-content active">
+            <div class="payment-form">
+                <h2>Nouveau Paiement</h2>
+                
+                <div class="form-group">
+                    <label for="member-select">Membre</label>
+                    <select id="member-select" required>
+                        <option value="">Sélectionner un membre...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="payment-type">Type de Paiement</label>
+                    <select id="payment-type" required>
+                        <option value="membership">Cotisation annuelle</option>
+                        <option value="event">Événement</option>
+                        <option value="training">Entraînement</option>
+                        <option value="equipment">Équipement</option>
+                        <option value="other">Autre</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="payment-amount">Montant (€)</label>
+                    <input type="number" id="payment-amount" class="amount-input" 
+                           placeholder="0.00" step="0.01" min="0" required>
+                    <div class="quick-amounts">
+                        <button class="quick-amount-btn" onclick="setAmount(25)">25€</button>
+                        <button class="quick-amount-btn" onclick="setAmount(50)">50€</button>
+                        <button class="quick-amount-btn" onclick="setAmount(100)">100€</button>
+                        <button class="quick-amount-btn" onclick="setAmount(150)">150€</button>
+                        <button class="quick-amount-btn" onclick="setAmount(200)">200€</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="payment-description">Description</label>
+                    <textarea id="payment-description" rows="3" 
+                              placeholder="Description du paiement..."></textarea>
+                </div>
+
+                <button class="btn btn-primary btn-block btn-generate" onclick="generatePaymentQR()">
+                    Générer QR Code de Paiement
+                </button>
+            </div>
+
+            <!-- QR Code Display (hidden by default) -->
+            <div id="qr-code-container" class="qr-code-container">
+                <h3>QR Code de Paiement</h3>
+                <div class="qr-code-image">
+                    <img id="qr-code-img" src="" alt="QR Code">
+                </div>
+                <div class="payment-reference" id="payment-reference"></div>
+                
+                <div class="payment-instructions">
+                    <h4>Instructions de paiement:</h4>
+                    <ol>
+                        <li>Ouvrez votre application bancaire ou Payconiq</li>
+                        <li>Scannez le QR code ci-dessus</li>
+                        <li>Vérifiez le montant et la référence</li>
+                        <li>Confirmez le paiement</li>
+                        <li>Le statut sera mis à jour automatiquement</li>
+                    </ol>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-download" onclick="downloadQRCode()">
+                        <span>💾</span> Télécharger QR
+                    </button>
+                    <button class="btn btn-share" onclick="sharePayment()">
+                        <span>📤</span> Partager
+                    </button>
+                    <button class="btn btn-primary" onclick="createNewPayment()">
+                        <span>➕</span> Nouveau Paiement
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment History Tab -->
+        <div id="history-tab" class="tab-content">
+            <div class="payment-history">
+                <div class="payment-filters">
+                    <div class="filter-group">
+                        <label>Période:</label>
+                        <select id="period-filter" onchange="filterPayments()">
+                            <option value="all">Tout</option>
+                            <option value="today">Aujourd'hui</option>
+                            <option value="week">Cette semaine</option>
+                            <option value="month" selected>Ce mois</option>
+                            <option value="year">Cette année</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Statut:</label>
+                        <select id="status-filter" onchange="filterPayments()">
+                            <option value="all">Tous</option>
+                            <option value="pending">En attente</option>
+                            <option value="confirmed">Confirmé</option>
+                            <option value="failed">Échoué</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Type:</label>
+                        <select id="type-filter" onchange="filterPayments()">
+                            <option value="all">Tous</option>
+                            <option value="membership">Cotisation</option>
+                            <option value="event">Événement</option>
+                            <option value="training">Entraînement</option>
+                            <option value="equipment">Équipement</option>
+                            <option value="other">Autre</option>
+                        </select>
+                    </div>
+                </div>
+
+                <table class="payment-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Référence</th>
+                            <th>Membre</th>
+                            <th>Type</th>
+                            <th>Montant</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="payment-history-body">
+                        <tr>
+                            <td colspan="7" class="loading-spinner">
+                                <div class="spinner"></div>
+                                <p>Chargement des paiements...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Statistics Tab -->
+        <div id="statistics-tab" class="tab-content">
+            <div class="statistics-grid">
+                <div class="stat-card">
+                    <h3>Total Collecté</h3>
+                    <div class="stat-value" id="total-collected">€0</div>
+                    <div class="stat-change positive">+12% ce mois</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Paiements ce Mois</h3>
+                    <div class="stat-value" id="monthly-payments">0</div>
+                    <div class="stat-change">Sur 45 membres</div>
+                </div>
+                <div class="stat-card">
+                    <h3>En Attente</h3>
+                    <div class="stat-value" id="pending-amount">€0</div>
+                    <div class="stat-change">3 paiements</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Taux de Collection</h3>
+                    <div class="stat-value" id="collection-rate">0%</div>
+                    <div class="stat-change positive">Excellent</div>
+                </div>
+            </div>
+
+            <div class="payment-history">
+                <h3>Répartition par Type</h3>
+                <canvas id="payment-chart" width="400" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Pending Payments Tab -->
+        <div id="pending-tab" class="tab-content">
+            <div class="payment-history">
+                <h3>Paiements En Attente</h3>
+                <table class="payment-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Référence</th>
+                            <th>Membre</th>
+                            <th>Montant</th>
+                            <th>Jours</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pending-payments-body">
+                        <tr>
+                            <td colspan="6" class="loading-spinner">
+                                <div class="spinner"></div>
+                                <p>Chargement...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="deployment-timestamp.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="auth-guard.js"></script>
+    <script src="navigation.js"></script>
+    <script src="payment-manager.js"></script>
+    <script src="session-manager.js"></script>
+    <script src="pwa-handler.js"></script>
+    
+    <script>
+        // Tab switching
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.payment-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            
+            // Load data for the selected tab
+            if (tabName === 'history') {
+                loadPaymentHistory();
+            } else if (tabName === 'statistics') {
+                loadStatistics();
+            } else if (tabName === 'pending') {
+                loadPendingPayments();
+            }
+        }
+
+        // Set quick amount
+        function setAmount(amount) {
+            document.getElementById('payment-amount').value = amount.toFixed(2);
+        }
+
+        // Generate Payment QR Code
+        async function generatePaymentQR() {
+            const memberSelect = document.getElementById('member-select');
+            const paymentType = document.getElementById('payment-type').value;
+            const amount = parseFloat(document.getElementById('payment-amount').value);
+            const description = document.getElementById('payment-description').value;
+            
+            if (!memberSelect.value || !amount || amount <= 0) {
+                alert('Veuillez remplir tous les champs obligatoires');
+                return;
+            }
+
+            try {
+                const memberOption = memberSelect.options[memberSelect.selectedIndex];
+                const memberName = memberOption.text;
+                const memberId = memberSelect.value;
+
+                const result = await window.paymentManager.generatePaymentQR({
+                    amount: amount,
+                    memberName: memberName,
+                    memberId: memberId,
+                    type: paymentType,
+                    description: description
+                });
+
+                // Display QR code
+                document.getElementById('qr-code-img').src = result.qrCodeDataUrl;
+                document.getElementById('payment-reference').textContent = 
+                    `Référence: ${result.reference}`;
+                
+                // Show QR code container, hide form
+                document.querySelector('.payment-form').style.display = 'none';
+                document.getElementById('qr-code-container').classList.add('active');
+                
+            } catch (error) {
+                console.error('Error generating QR code:', error);
+                alert('Erreur lors de la génération du QR code');
+            }
+        }
+
+        // Create new payment
+        function createNewPayment() {
+            document.querySelector('.payment-form').style.display = 'block';
+            document.getElementById('qr-code-container').classList.remove('active');
+            document.getElementById('payment-amount').value = '';
+            document.getElementById('payment-description').value = '';
+        }
+
+        // Download QR Code
+        function downloadQRCode() {
+            const link = document.createElement('a');
+            link.download = `payment-qr-${Date.now()}.png`;
+            link.href = document.getElementById('qr-code-img').src;
+            link.click();
+        }
+
+        // Share payment
+        async function sharePayment() {
+            const reference = document.getElementById('payment-reference').textContent;
+            const amount = document.getElementById('payment-amount').value;
+            
+            const shareData = {
+                title: 'CalyClub - Demande de Paiement',
+                text: `${reference}\nMontant: €${amount}`,
+                url: window.location.href
+            };
+            
+            try {
+                if (navigator.share) {
+                    await navigator.share(shareData);
+                } else {
+                    // Fallback: copy to clipboard
+                    await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
+                    alert('Lien copié dans le presse-papier');
+                }
+            } catch (error) {
+                console.error('Error sharing:', error);
+            }
+        }
+
+        // Load members for dropdown
+        async function loadMembers() {
+            try {
+                const snapshot = await window.db.collection('membres')
+                    .orderBy('nom')
+                    .get();
+                
+                const select = document.getElementById('member-select');
+                select.innerHTML = '<option value="">Sélectionner un membre...</option>';
+                
+                snapshot.docs.forEach(doc => {
+                    const member = doc.data();
+                    const option = document.createElement('option');
+                    option.value = doc.id;
+                    option.textContent = `${member.nom} ${member.prenom}`;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading members:', error);
+            }
+        }
+
+        // Load payment history
+        async function loadPaymentHistory() {
+            try {
+                const payments = await window.paymentManager.getPendingPayments();
+                const tbody = document.getElementById('payment-history-body');
+                
+                if (payments.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7">Aucun paiement trouvé</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = payments.map(payment => `
+                    <tr>
+                        <td>${new Date(payment.createdAt?.seconds * 1000).toLocaleDateString()}</td>
+                        <td>${payment.reference || '-'}</td>
+                        <td>${payment.memberName || '-'}</td>
+                        <td>${payment.type || '-'}</td>
+                        <td>€${payment.amount?.toFixed(2) || '0.00'}</td>
+                        <td><span class="payment-status ${payment.status}">${payment.status}</span></td>
+                        <td>
+                            <button class="btn btn-sm" onclick="viewPayment('${payment.id}')">Voir</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading payment history:', error);
+            }
+        }
+
+        // Load statistics
+        async function loadStatistics() {
+            try {
+                const startDate = new Date();
+                startDate.setMonth(startDate.getMonth() - 1);
+                const endDate = new Date();
+                
+                const stats = await window.paymentManager.getPaymentStatistics(startDate, endDate);
+                
+                if (stats) {
+                    document.getElementById('total-collected').textContent = 
+                        `€${stats.totalAmount.toFixed(2)}`;
+                    document.getElementById('monthly-payments').textContent = 
+                        stats.totalCount;
+                }
+            } catch (error) {
+                console.error('Error loading statistics:', error);
+            }
+        }
+
+        // Load pending payments
+        async function loadPendingPayments() {
+            try {
+                const payments = await window.paymentManager.getPendingPayments();
+                const tbody = document.getElementById('pending-payments-body');
+                
+                if (payments.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6">Aucun paiement en attente</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = payments.map(payment => {
+                    const daysPending = Math.floor(
+                        (Date.now() - payment.createdAt?.seconds * 1000) / (1000 * 60 * 60 * 24)
+                    );
+                    
+                    return `
+                        <tr>
+                            <td>${new Date(payment.createdAt?.seconds * 1000).toLocaleDateString()}</td>
+                            <td>${payment.reference || '-'}</td>
+                            <td>${payment.memberName || '-'}</td>
+                            <td>€${payment.amount?.toFixed(2) || '0.00'}</td>
+                            <td>${daysPending} jours</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" onclick="markAsPaid('${payment.id}')">
+                                    Marquer payé
+                                </button>
+                                <button class="btn btn-sm" onclick="sendReminder('${payment.id}')">
+                                    Rappel
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Error loading pending payments:', error);
+            }
+        }
+
+        // Export payments
+        async function exportPayments() {
+            try {
+                const payments = await window.paymentManager.getPendingPayments();
+                window.paymentManager.exportPaymentsToCSV(payments);
+            } catch (error) {
+                console.error('Error exporting payments:', error);
+                alert('Erreur lors de l\'export');
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadMembers();
+        });
+    </script>
+</body>
+</html>

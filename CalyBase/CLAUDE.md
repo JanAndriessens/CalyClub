@@ -6,6 +6,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 CalyClub is a Firebase-based member management PWA with dual deployment (Firebase Hosting + Vercel). The application uses vanilla JavaScript with Firebase SDK v8 for browser compatibility, especially optimized for iPad Safari.
 
+## IMPORTANT: Project Master Plan Tracking
+
+**ALWAYS update `PROJECT-MASTER-PLAN.md` when implementing features:**
+1. Before starting work, check the master plan for current status
+2. Update the "Implementation Status" section as you complete features
+3. Mark items as COMPLETED with checkmarks (✅) when done
+4. Add completion dates and any relevant notes
+5. Update percentages for in-progress features
+6. Document any blockers or dependencies discovered
+
+The PROJECT-MASTER-PLAN.md is the single source of truth for project progress and should be kept current at all times.
+
 ## Development Commands
 
 ### Local Development
