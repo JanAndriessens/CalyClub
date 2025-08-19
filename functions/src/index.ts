@@ -229,7 +229,7 @@ app.post('/auth/delete-user', cors({
 
 // API Routes
 app.get('/status', (req, res) => {
-    res.json({ message: 'Bienvenue sur l\'API CalyBase - Firebase Functions', version: '1.1.1' });
+    res.json({ message: 'Bienvenue sur l\'API CalyClub - Firebase Functions', version: '1.1.1' });
 });
 
 // Test DELETE endpoint

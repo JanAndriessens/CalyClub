@@ -16,9 +16,13 @@
       "Bash(node:*)",
       "Bash(.pwa-deploy.bat)",
       "WebFetch(domain:localhost)",
-      "Bash(firebase emulators:start:*)"
+      "Bash(firebase emulators:start:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
-    "ask": []
+    "ask": [],
+    "additionalDirectories": [
+      "C:\\c\\Users\\janan\\Documents\\GitHub"
+    ]
   }
 }

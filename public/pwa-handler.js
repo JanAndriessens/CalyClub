@@ -65,7 +65,7 @@
       banner.innerHTML = `
         <div class="pwa-install-content">
           <div class="pwa-install-text">
-            <strong>Install CalyBase</strong>
+            <strong>Install CalyClub</strong>
             <span>Add to home screen for quick access</span>
           </div>
           <div class="pwa-install-actions">
@@ -275,8 +275,8 @@
         prompt.className = 'ios-install-prompt';
         prompt.innerHTML = `
           <div class="ios-install-content">
-            <h3>Install CalyBase</h3>
-            <p>Add CalyBase to your home screen for quick access:</p>
+            <h3>Install CalyClub</h3>
+            <p>Add CalyClub to your home screen for quick access:</p>
             <ol class="ios-install-steps">
               <li>Tap the Share button <span style="font-size: 20px;">⬆️</span></li>
               <li>Scroll down and tap "Add to Home Screen"</li>
@@ -315,7 +315,7 @@
     notification.className = 'pwa-update-notification';
     notification.innerHTML = `
       <div class="pwa-update-content">
-        <span>A new version of CalyBase is available!</span>
+        <span>A new version of CalyClub is available!</span>
         <button onclick="window.location.reload()">Update</button>
       </div>
     `;
