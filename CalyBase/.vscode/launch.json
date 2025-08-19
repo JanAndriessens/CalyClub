@@ -31,7 +31,7 @@
       "type": "node",
       "request": "launch",
       "program": "${workspaceFolder}/node_modules/.bin/open-cli",
-      "args": ["https://caly-base.vercel.app/"],
+      "args": ["https://calyclub.vercel.app/"],
       "console": "integratedTerminal"
     }
   ]

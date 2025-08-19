@@ -15,7 +15,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy:quick": "git add . && git commit -m \"Quick deploy: $(date)\" && git push origin main && echo '🚀 Quick deployment initiated!'",
     "deploy:message": "git add . && echo 'Enter commit message:' && read msg && git commit -m \"$msg\" && git push origin main && echo '📝 Custom deployment complete!'",
-    "deploy:verify": "echo '📊 Git Status:' && git status --porcelain && echo '🌐 Live Site: https://caly-base.vercel.app/' && echo '✅ Last Commit:' && git log -1 --oneline",
+    "deploy:verify": "echo '📊 Git Status:' && git status --porcelain && echo '🌐 Live Site: https://calyclub.vercel.app/' && echo '✅ Last Commit:' && git log -1 --oneline",
     "deploy:watch": "echo '🔄 Starting deployment watcher...' && fswatch -o . | xargs -n1 -I{} npm run deploy:quick",
     "setup:hooks": "echo '🔧 Setting up deployment hooks...' && mkdir -p .git/hooks && echo '#!/bin/sh\nnpm run deploy:verify' > .git/hooks/post-commit && chmod +x .git/hooks/post-commit && echo '✅ Deployment hooks installed!'"
   },

@@ -21,7 +21,7 @@ Open Command Palette (`Cmd+Shift+P`) and type "Tasks: Run Task":
 2. **📝 Deploy with Message** - Interactive deployment with custom commit message
 3. **✅ Deploy Verification** - Check deployment status and git state
 4. **🔄 Auto Deploy (Watch Mode)** - Automatic deployment on file changes
-5. **🌐 Open Live Site** - Launch https://caly-base.vercel.app/
+5. **🌐 Open Live Site** - Launch https://calyclub.vercel.app/
 6. **📊 Git Status** - Show current repository status
 7. **🔧 Setup Deploy Hooks** - Install git hooks for automatic deployment
 8. **🏃‍♂️ Emergency Deploy** - Immediate deployment for hotfixes
@@ -43,7 +43,7 @@ npm run setup:hooks       # Install git hooks
 2. **Save changes** (auto-save enabled)
 3. **Deploy via shortcuts** or let auto-deploy handle it
 4. **Vercel automatically builds** from GitHub
-5. **Live site updates** at https://caly-base.vercel.app/
+5. **Live site updates** at https://calyclub.vercel.app/
 
 ## Configuration Files
 
@@ -61,7 +61,7 @@ npm run setup:hooks       # Install git hooks
 
 ## Live Site
 
-🌐 **Production**: https://caly-base.vercel.app/
+🌐 **Production**: https://calyclub.vercel.app/
 
 ## Troubleshooting
 

@@ -291,7 +291,7 @@ RECAPTCHA_SECRET_KEY=your_recaptcha_secret
 2. Run `npm run optimize` for production build
 3. Commit to GitHub: `git commit -m "description"`
 4. Push to trigger Vercel deployment: `git push`
-5. Verify deployment at https://caly-base.vercel.app
+5. Verify deployment at https://calyclub.vercel.app
 
 ## Cost Analysis
 
@@ -333,7 +333,7 @@ RECAPTCHA_SECRET_KEY=your_recaptcha_secret
 - Firebase Console: https://console.firebase.google.com
 - Vercel Dashboard: https://vercel.com/dashboard
 - GitHub Repository: https://github.com/JanAndriessens/CalyClub
-- Live Application: https://caly-base.vercel.app
+- Live Application: https://calyclub.vercel.app
 
 ## Implementation Files Created (January 2025)
 

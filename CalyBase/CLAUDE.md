@@ -151,7 +151,7 @@ try {
 - **Firebase**: Manual deployment via `firebase deploy`
 - **Verification**: Each page includes `deployment-timestamp.js` for version checking
 - **Domains**: 
-  - Production: https://caly-base.vercel.app
+  - Production: https://calyclub.vercel.app
   - Firebase: https://calyclub.firebaseapp.com
 
 ### Security Considerations

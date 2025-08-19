@@ -11,7 +11,7 @@ const bucket = admin.storage().bucket();
 
 const corsConfiguration = [
   {
-    origin: ['http://localhost:3000', 'https://calybase.firebaseapp.com', 'https://calybase.web.app'],
+    origin: ['http://localhost:3000', 'https://calyclub.firebaseapp.com', 'https://calyclub.web.app'],
     method: ['GET', 'POST', 'PUT', 'DELETE', 'HEAD'],
     maxAgeSeconds: 3600,
     responseHeader: ['Content-Type', 'Authorization', 'Content-Length', 'User-Agent', 'x-goog-resumable']
