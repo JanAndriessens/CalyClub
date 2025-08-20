@@ -161,7 +161,7 @@ async function initializeSystemConfig() {
         
         console.log('✅ System configuration initialized successfully!');
         console.log('📄 Configuration stored in Firestore: systemConfig/main');
-        console.log('🔗 Access via: https://calybase.web.app/system-settings.html');
+        console.log('🔗 Access via: https://caly.club/system-settings.html');
         
     } catch (error) {
         console.error('❌ Error initializing system configuration:', error);

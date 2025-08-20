@@ -14,8 +14,9 @@
         },
         
         isProduction: () => {
-            return window.location.hostname.includes('calybase.web.app') ||
-                   window.location.hostname.includes('calybase.firebaseapp.com') ||
+            return window.location.hostname.includes('caly.club') ||
+                   window.location.hostname.includes('calyclub.web.app') ||
+                   window.location.hostname.includes('calyclub.firebaseapp.com') ||
                    window.location.hostname.includes('vercel.app');
         },
         

@@ -22,10 +22,11 @@ if (!admin.apps.length) {
 const app = express();
 
 const allowedOrigins = [
-  'https://calybase.web.app',
-  'https://calybase.firebaseapp.com',
-  'https://calybase.vercel.app',
-  'https://caly-base.vercel.app',
+  'https://caly.club',
+  'https://www.caly.club',
+  'https://calyclub.web.app',
+  'https://calyclub.firebaseapp.com',
+  'https://calyclub.vercel.app',
   'http://localhost:3000',
   'http://localhost:3001',
   'http://localhost:5000'
