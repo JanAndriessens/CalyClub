@@ -11,6 +11,8 @@ async function loadFirebaseConfig() {
                             hostname.includes('calyclub') || 
                             hostname.includes('vercel.app'); // Covers all deployments
         
+        console.log('🔍 Domain check:', { hostname, isProduction, includes_caly: hostname.includes('caly.club') });
+        
         if (isProduction) {
             console.log('✅ Using production Firebase configuration for:', hostname);
             const config = {
