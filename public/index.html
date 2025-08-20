@@ -695,13 +695,25 @@
                 
             } catch (error) {
                 console.error('❌ Firebase initialization error:', error);
-                // Show user-friendly error message
+                console.log('🔍 Debug info:', {
+                    hostname: window.location.hostname,
+                    firebaseConfigPromise: !!window.firebaseConfigPromise,
+                    firebaseAvailable: typeof firebase !== 'undefined',
+                    error: error.message
+                });
+                
+                // Show user-friendly error message with debug info
                 document.body.innerHTML = `
                     <div style="padding: 2rem; text-align: center; color: #e74c3c;">
-                        <h2>Erreur de Configuration</h2>
-                        <p>Impossible de charger Firebase. Veuillez rafraîchir la page.</p>
+                        <h2>Erreur de Configuration Firebase</h2>
+                        <p>Erreur lors de l'initialisation: ${error.message}</p>
+                        <p style="font-size: 12px; color: #666;">Domaine: ${window.location.hostname}</p>
+                        <p style="font-size: 12px; color: #666;">Firebase disponible: ${typeof firebase !== 'undefined' ? 'Oui' : 'Non'}</p>
                         <button onclick="location.reload()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">
                             Rafraîchir
+                        </button>
+                        <button onclick="console.log('Debug:', {config: window.firebaseConfig, firebase: typeof firebase})" style="margin-left: 1rem; padding: 0.5rem 1rem; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            Debug Console
                         </button>
                     </div>
                 `;

@@ -3,14 +3,16 @@
 
 async function loadFirebaseConfig() {
     try {
+        const hostname = window.location.hostname.toLowerCase();
+        console.log('🔧 Loading Firebase config for hostname:', hostname);
+        
         // For production deployment, use static config
-        const isProduction = window.location.hostname.includes('caly.club') ||
-                            window.location.hostname.includes('calyclub-72808.web.app') || 
-                            window.location.hostname.includes('calyclub-72808.firebaseapp.com') ||
-                            window.location.hostname.includes('vercel.app'); // Covers all Vercel deployments
+        const isProduction = hostname.includes('caly.club') ||
+                            hostname.includes('calyclub') || 
+                            hostname.includes('vercel.app'); // Covers all deployments
         
         if (isProduction) {
-            console.log('✅ Using production Firebase configuration');
+            console.log('✅ Using production Firebase configuration for:', hostname);
             const config = {
                 firebase: {
                     apiKey: "AIzaSyAJHe5b04puLllWJAlqQz9or-Dz4cvs2gU",
@@ -35,6 +37,8 @@ async function loadFirebaseConfig() {
             window.firebaseConfig = config.firebase;
             window.recaptchaSiteKey = config.recaptcha.siteKey;
             window.oauthConfig = config.oauth;
+            
+            console.log('🔥 Firebase config loaded successfully:', config.firebase.projectId);
             return config.firebase;
         }
         
@@ -75,7 +79,26 @@ async function loadFirebaseConfig() {
         return config.firebase;
     } catch (error) {
         console.error('❌ Failed to load Firebase configuration:', error);
-        throw new Error('Firebase configuration could not be loaded');
+        
+        // Emergency fallback configuration for caly.club
+        console.log('⚠️ Using emergency fallback Firebase configuration');
+        const fallbackConfig = {
+            apiKey: "AIzaSyAJHe5b04puLllWJAlqQz9or-Dz4cvs2gU",
+            authDomain: "calyclub-72808.firebaseapp.com",
+            projectId: "calyclub-72808",
+            storageBucket: "calyclub-72808.firebasestorage.app",
+            messagingSenderId: "496335267337",
+            appId: "1:496335267337:web:a92d7f2447ced926243ad8",
+            measurementId: "G-585K5JBB4J"
+        };
+        
+        window.firebaseConfig = fallbackConfig;
+        window.recaptchaSiteKey = "your-recaptcha-site-key";
+        window.oauthConfig = {
+            google: { clientId: "108529148364-4jt6ucd02f92jaco7pvcheo0dld2k1fq.apps.googleusercontent.com" }
+        };
+        
+        return fallbackConfig;
     }
 }
 
