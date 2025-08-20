@@ -419,7 +419,26 @@
 </head>
 <body>
     <!-- Navigation -->
-    <nav id="navigation"></nav>
+    <nav class="navbar">
+        <div class="logo-container">
+            <div class="logo-image">
+                <img src="images/CalypsoDC-VerticPos_rvb.png" alt="CalypsoDC Logo">
+            </div>
+            <div class="logo-text-container">
+                <div class="logo-text">CalyClub</div>
+                <div class="username-text" id="usernameText" style="display: none;"></div>
+            </div>
+        </div>
+        <div class="nav-links">
+            <a href="/index.html">Accueil</a>
+            <a href="/membres.html">Membres</a>
+            <a href="/events.html">Événements</a>
+            <a href="/payments.html" class="active">Paiements</a>
+            <a href="/treasury.html">Trésorerie</a>
+            <a href="/who-is-who.html">Annuaire</a>
+            <a href="#" id="authLink" class="logout-link">Déconnexion</a>
+        </div>
+    </nav>
 
     <!-- Main Content -->
     <div class="payment-container">

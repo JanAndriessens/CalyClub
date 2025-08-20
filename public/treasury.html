@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Trésorerie - CalyClub</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- <link rel="manifest" href="manifest.json"> -->
+    <meta name="theme-color" content="#0066cc">
+    
+    <style>
+        .treasury-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .treasury-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .treasury-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+            overflow-x: auto;
+        }
+
+        .treasury-tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .treasury-tab.active {
+            color: #0066cc;
+            border-bottom-color: #0066cc;
+            font-weight: 600;
+        }
+
+        .treasury-tab:hover {
+            background: rgba(0, 102, 204, 0.05);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Dashboard Cards */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .card-icon.balance { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .card-icon.income { background: linear-gradient(135deg, #00c9ff, #92fe9d); color: white; }
+        .card-icon.expense { background: linear-gradient(135deg, #fc466b, #3f5efb); color: white; }
+        .card-icon.pending { background: linear-gradient(135deg, #fdbb2d, #22c1c3); color: white; }
+
+        .card-title {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .card-change {
+            font-size: 12px;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .card-change.positive { color: #00c853; }
+        .card-change.negative { color: #d32f2f; }
+
+        /* Import Section */
+        .import-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .import-dropzone {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: #f8f9fa;
+        }
+
+        .import-dropzone:hover,
+        .import-dropzone.dragover {
+            border-color: #0066cc;
+            background: rgba(0, 102, 204, 0.05);
+        }
+
+        .import-icon {
+            font-size: 48px;
+            color: #0066cc;
+            margin-bottom: 15px;
+        }
+
+        .import-text {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .import-hint {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .bank-badges {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .bank-badge {
+            padding: 5px 12px;
+            background: #f0f0f0;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Transactions Table */
+        .transactions-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-input,
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .transactions-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .transactions-table th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .transactions-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .transactions-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .amount {
+            font-weight: 600;
+        }
+
+        .amount.credit { color: #00c853; }
+        .amount.debit { color: #d32f2f; }
+
+        .category-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .status-badge.reconciled { background: #e8f5e9; color: #2e7d32; }
+        .status-badge.pending { background: #fff3e0; color: #f57c00; }
+        .status-badge.unmatched { background: #ffebee; color: #c62828; }
+
+        /* Reports Section */
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .report-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .report-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .chart-placeholder {
+            height: 200px;
+            background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #0066cc;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0052a3;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .treasury-container {
+                padding: 15px;
+            }
+
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .treasury-tabs {
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .transactions-table {
+                font-size: 14px;
+            }
+
+            .transactions-table th,
+            .transactions-table td {
+                padding: 8px;
+            }
+
+            .filter-controls {
+                width: 100%;
+            }
+
+            .filter-input,
+            .filter-select {
+                flex: 1;
+            }
+        }
+
+        /* Loading State */
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            color: #0066cc;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0066cc;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo-container">
+            <div class="logo-image">
+                <img src="images/CalypsoDC-VerticPos_rvb.png" alt="CalypsoDC Logo">
+            </div>
+            <div class="logo-text-container">
+                <div class="logo-text">CalyClub</div>
+                <div class="username-text" id="usernameText" style="display: none;"></div>
+            </div>
+        </div>
+        <div class="nav-links">
+            <a href="/index.html">Accueil</a>
+            <a href="/membres.html">Membres</a>
+            <a href="/events.html">Événements</a>
+            <a href="/payments.html">Paiements</a>
+            <a href="/treasury.html" class="active">Trésorerie</a>
+            <a href="/who-is-who.html">Annuaire</a>
+            <a href="#" id="authLink" class="logout-link">Déconnexion</a>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="treasury-container">
+        <!-- Header -->
+        <div class="treasury-header">
+            <h1><i class="fas fa-coins"></i> Gestion de la Trésorerie</h1>
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="openImportModal()">
+                    <i class="fas fa-file-import"></i> Importer CSV
+                </button>
+                <button class="btn btn-success" onclick="generateReport()">
+                    <i class="fas fa-chart-line"></i> Générer Rapport
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="treasury-tabs">
+            <button class="treasury-tab active" onclick="switchTab('dashboard')">
+                <i class="fas fa-tachometer-alt"></i> Tableau de Bord
+            </button>
+            <button class="treasury-tab" onclick="switchTab('import')">
+                <i class="fas fa-file-upload"></i> Import Bancaire
+            </button>
+            <button class="treasury-tab" onclick="switchTab('transactions')">
+                <i class="fas fa-list"></i> Transactions
+            </button>
+            <button class="treasury-tab" onclick="switchTab('reconciliation')">
+                <i class="fas fa-check-double"></i> Réconciliation
+            </button>
+            <button class="treasury-tab" onclick="switchTab('reports')">
+                <i class="fas fa-chart-pie"></i> Rapports
+            </button>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard-tab" class="tab-content active">
+            <div class="dashboard-cards">
+                <div class="dashboard-card">
+                    <div class="card-icon balance">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="card-title">Solde Actuel</div>
+                    <div class="card-value" id="current-balance">€0.00</div>
+                    <div class="card-change positive">
+                        <i class="fas fa-arrow-up"></i> +5.2% ce mois
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-icon income">
+                        <i class="fas fa-arrow-down"></i>
+                    </div>
+                    <div class="card-title">Revenus (30j)</div>
+                    <div class="card-value" id="income-30d">€0.00</div>
+                    <div class="card-change positive">
+                        <i class="fas fa-arrow-up"></i> +12.5%
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-icon expense">
+                        <i class="fas fa-arrow-up"></i>
+                    </div>
+                    <div class="card-title">Dépenses (30j)</div>
+                    <div class="card-value" id="expenses-30d">€0.00</div>
+                    <div class="card-change negative">
+                        <i class="fas fa-arrow-down"></i> -3.8%
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-icon pending">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="card-title">En Attente</div>
+                    <div class="card-value" id="pending-amount">€0.00</div>
+                    <div class="card-change">
+                        12 transactions
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Transactions Preview -->
+            <div class="transactions-section">
+                <div class="section-header">
+                    <h2 class="section-title">Transactions Récentes</h2>
+                    <a href="#" onclick="switchTab('transactions')" class="btn btn-secondary">
+                        Voir Tout <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <table class="transactions-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Catégorie</th>
+                            <th>Montant</th>
+                            <th>Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-transactions">
+                        <tr>
+                            <td colspan="5" class="loading-spinner">
+                                <div class="spinner"></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Import Tab -->
+        <div id="import-tab" class="tab-content">
+            <div class="import-section">
+                <div class="import-dropzone" id="csv-dropzone">
+                    <div class="import-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <div class="import-text">
+                        Glissez-déposez votre fichier CSV ici
+                    </div>
+                    <div class="import-hint">
+                        ou cliquez pour sélectionner un fichier
+                    </div>
+                    <input type="file" id="csv-file-input" accept=".csv" style="display: none;">
+                </div>
+                
+                <div class="bank-badges">
+                    <span class="bank-badge">Belfius</span>
+                    <span class="bank-badge">KBC</span>
+                    <span class="bank-badge">ING</span>
+                    <span class="bank-badge">BNP Paribas Fortis</span>
+                    <span class="bank-badge">Argenta</span>
+                </div>
+            </div>
+
+            <div id="import-results" class="import-results" style="display: none;">
+                <!-- Import results will be shown here -->
+            </div>
+        </div>
+
+        <!-- Transactions Tab -->
+        <div id="transactions-tab" class="tab-content">
+            <div class="transactions-section">
+                <div class="section-header">
+                    <h2 class="section-title">Toutes les Transactions</h2>
+                    <div class="filter-controls">
+                        <input type="text" class="filter-input" placeholder="Rechercher..." id="search-input">
+                        <select class="filter-select" id="category-filter">
+                            <option value="">Toutes catégories</option>
+                            <option value="cotisation">Cotisations</option>
+                            <option value="formation">Formations</option>
+                            <option value="materiel">Matériel</option>
+                            <option value="sortie">Sorties</option>
+                            <option value="autre">Autre</option>
+                        </select>
+                        <select class="filter-select" id="status-filter">
+                            <option value="">Tous statuts</option>
+                            <option value="reconciled">Réconcilié</option>
+                            <option value="pending">En attente</option>
+                            <option value="unmatched">Non apparié</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <table class="transactions-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Référence</th>
+                            <th>Description</th>
+                            <th>Catégorie</th>
+                            <th>Débit</th>
+                            <th>Crédit</th>
+                            <th>Solde</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="all-transactions">
+                        <tr>
+                            <td colspan="9" style="text-align: center; padding: 40px;">
+                                Aucune transaction à afficher
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Reconciliation Tab -->
+        <div id="reconciliation-tab" class="tab-content">
+            <div class="import-section">
+                <h2>Réconciliation Bancaire</h2>
+                <p>Comparez vos transactions bancaires avec vos enregistrements internes.</p>
+                
+                <div class="action-buttons" style="margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="startReconciliation()">
+                        <i class="fas fa-sync"></i> Démarrer la Réconciliation
+                    </button>
+                    <button class="btn btn-secondary" onclick="autoMatch()">
+                        <i class="fas fa-magic"></i> Correspondance Automatique
+                    </button>
+                </div>
+
+                <div id="reconciliation-results" style="margin-top: 30px;">
+                    <!-- Reconciliation results will appear here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Tab -->
+        <div id="reports-tab" class="tab-content">
+            <div class="reports-grid">
+                <div class="report-card">
+                    <h3 class="report-title">Évolution du Solde</h3>
+                    <div class="chart-placeholder">
+                        <i class="fas fa-chart-line" style="font-size: 48px;"></i>
+                    </div>
+                </div>
+
+                <div class="report-card">
+                    <h3 class="report-title">Répartition des Dépenses</h3>
+                    <div class="chart-placeholder">
+                        <i class="fas fa-chart-pie" style="font-size: 48px;"></i>
+                    </div>
+                </div>
+
+                <div class="report-card">
+                    <h3 class="report-title">Revenus vs Dépenses</h3>
+                    <div class="chart-placeholder">
+                        <i class="fas fa-chart-bar" style="font-size: 48px;"></i>
+                    </div>
+                </div>
+
+                <div class="report-card">
+                    <h3 class="report-title">Prévisions</h3>
+                    <div class="chart-placeholder">
+                        <i class="fas fa-chart-area" style="font-size: 48px;"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons" style="margin-top: 30px;">
+                <button class="btn btn-primary" onclick="exportReport('pdf')">
+                    <i class="fas fa-file-pdf"></i> Exporter PDF
+                </button>
+                <button class="btn btn-success" onclick="exportReport('excel')">
+                    <i class="fas fa-file-excel"></i> Exporter Excel
+                </button>
+                <button class="btn btn-secondary" onclick="printReport()">
+                    <i class="fas fa-print"></i> Imprimer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="deployment-timestamp.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <script src="auth-guard.js"></script>
+    <script src="navigation.js"></script>
+    <script src="treasury-manager.js"></script>
+    
+    <script>
+        // Initialize Treasury Manager
+        let treasuryManager;
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Wait for Firebase to initialize
+                await window.firebaseConfigPromise;
+                
+                // Initialize Treasury Manager
+                treasuryManager = new TreasuryManager();
+                
+                // Load initial data
+                await loadDashboardData();
+                
+                // Setup event listeners
+                setupEventListeners();
+                
+            } catch (error) {
+                console.error('Error initializing treasury page:', error);
+            }
+        });
+
+        // Tab switching functionality
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.treasury-tab').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            
+            // Add active class to clicked tab button
+            event.target.closest('.treasury-tab').classList.add('active');
+        }
+
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                // This would normally fetch real data from Firestore
+                // For now, using placeholder data
+                document.getElementById('current-balance').textContent = '€2,543.67';
+                document.getElementById('income-30d').textContent = '€1,250.00';
+                document.getElementById('expenses-30d').textContent = '€876.43';
+                document.getElementById('pending-amount').textContent = '€450.00';
+                
+                // Load recent transactions
+                loadRecentTransactions();
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+
+        // Load recent transactions
+        function loadRecentTransactions() {
+            const tbody = document.getElementById('recent-transactions');
+            
+            // Sample data - replace with actual Firestore data
+            const sampleTransactions = [
+                { date: '2025-01-19', description: 'Cotisation - Jean Dupont', category: 'cotisation', amount: 150, type: 'credit', status: 'reconciled' },
+                { date: '2025-01-18', description: 'Achat matériel plongée', category: 'materiel', amount: -450.50, type: 'debit', status: 'pending' },
+                { date: '2025-01-17', description: 'Formation N2 - Marie Martin', category: 'formation', amount: 280, type: 'credit', status: 'reconciled' },
+                { date: '2025-01-16', description: 'Location piscine', category: 'sortie', amount: -120, type: 'debit', status: 'reconciled' },
+                { date: '2025-01-15', description: 'Cotisation - Paul Durand', category: 'cotisation', amount: 150, type: 'credit', status: 'pending' }
+            ];
+            
+            tbody.innerHTML = sampleTransactions.map(t => `
+                <tr>
+                    <td>${new Date(t.date).toLocaleDateString('fr-BE')}</td>
+                    <td>${t.description}</td>
+                    <td><span class="category-badge">${t.category}</span></td>
+                    <td class="amount ${t.type}">€${Math.abs(t.amount).toFixed(2)}</td>
+                    <td><span class="status-badge ${t.status}">${getStatusLabel(t.status)}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        // Get status label in French
+        function getStatusLabel(status) {
+            const labels = {
+                'reconciled': 'Réconcilié',
+                'pending': 'En attente',
+                'unmatched': 'Non apparié'
+            };
+            return labels[status] || status;
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // CSV Import
+            const dropzone = document.getElementById('csv-dropzone');
+            const fileInput = document.getElementById('csv-file-input');
+            
+            if (dropzone) {
+                dropzone.addEventListener('click', () => fileInput.click());
+                
+                dropzone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dropzone.classList.add('dragover');
+                });
+                
+                dropzone.addEventListener('dragleave', () => {
+                    dropzone.classList.remove('dragover');
+                });
+                
+                dropzone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropzone.classList.remove('dragover');
+                    
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        handleFileUpload(files[0]);
+                    }
+                });
+                
+                fileInput.addEventListener('change', (e) => {
+                    if (e.target.files.length > 0) {
+                        handleFileUpload(e.target.files[0]);
+                    }
+                });
+            }
+            
+            // Search functionality
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.addEventListener('input', filterTransactions);
+            }
+            
+            // Filter selects
+            const categoryFilter = document.getElementById('category-filter');
+            const statusFilter = document.getElementById('status-filter');
+            
+            if (categoryFilter) {
+                categoryFilter.addEventListener('change', filterTransactions);
+            }
+            
+            if (statusFilter) {
+                statusFilter.addEventListener('change', filterTransactions);
+            }
+        }
+
+        // Handle file upload
+        async function handleFileUpload(file) {
+            if (!file.name.endsWith('.csv')) {
+                alert('Veuillez sélectionner un fichier CSV');
+                return;
+            }
+            
+            try {
+                const text = await file.text();
+                const result = await treasuryManager.importBankCSV(text);
+                
+                if (result.success) {
+                    alert(`Import réussi! ${result.transactions.length} transactions importées.`);
+                    loadDashboardData();
+                    switchTab('transactions');
+                } else {
+                    alert(`Erreur lors de l'import: ${result.error}`);
+                }
+            } catch (error) {
+                console.error('Error uploading file:', error);
+                alert('Erreur lors de l\'upload du fichier');
+            }
+        }
+
+        // Filter transactions
+        function filterTransactions() {
+            // Implementation for filtering transactions
+            console.log('Filtering transactions...');
+        }
+
+        // Start reconciliation
+        async function startReconciliation() {
+            try {
+                const result = await treasuryManager.reconcileTransactions();
+                displayReconciliationResults(result);
+            } catch (error) {
+                console.error('Error starting reconciliation:', error);
+                alert('Erreur lors de la réconciliation');
+            }
+        }
+
+        // Auto match transactions
+        async function autoMatch() {
+            alert('Correspondance automatique en cours...');
+            // Implementation for auto-matching
+        }
+
+        // Display reconciliation results
+        function displayReconciliationResults(results) {
+            const container = document.getElementById('reconciliation-results');
+            // Display results in the container
+            container.innerHTML = '<p>Réconciliation terminée</p>';
+        }
+
+        // Generate report
+        async function generateReport() {
+            try {
+                const report = await treasuryManager.generateFinancialReport();
+                console.log('Report generated:', report);
+                alert('Rapport généré avec succès!');
+            } catch (error) {
+                console.error('Error generating report:', error);
+                alert('Erreur lors de la génération du rapport');
+            }
+        }
+
+        // Export report
+        function exportReport(format) {
+            alert(`Export en ${format.toUpperCase()} en cours...`);
+            // Implementation for export
+        }
+
+        // Print report
+        function printReport() {
+            window.print();
+        }
+
+        // Open import modal
+        function openImportModal() {
+            switchTab('import');
+        }
+    </script>
+
+    <!-- Mobile navigation -->
+    <script src="mobile-navigation.js"></script>
+    <script src="mobile-fab.js"></script>
+</body>
+</html>
