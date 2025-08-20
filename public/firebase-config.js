@@ -4,7 +4,8 @@
 async function loadFirebaseConfig() {
     try {
         // For production deployment, use static config
-        const isProduction = window.location.hostname.includes('calyclub-72808.web.app') || 
+        const isProduction = window.location.hostname.includes('caly.club') ||
+                            window.location.hostname.includes('calyclub-72808.web.app') || 
                             window.location.hostname.includes('calyclub-72808.firebaseapp.com') ||
                             window.location.hostname.includes('vercel.app'); // Covers all Vercel deployments
         

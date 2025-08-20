@@ -1,4 +1,4 @@
-// Production-Ready Logging System for CalyBase
+// Production-Ready Logging System for CalyClub
 // Replaces console statements with environment-aware logging
 
 (function() {
@@ -264,7 +264,7 @@
     }
 
     // Global logger instance
-    const logger = new Logger('CalyBase');
+    const logger = new Logger('CalyClub');
 
     // Export logger
     window.Logger = Logger;
@@ -273,7 +273,7 @@
     
     // Debug utilities for development
     if (Environment.isDevelopment()) {
-        window.debugCalyBase = {
+        window.debugCalyClub = {
             logs: () => LogStorage.getLogs(),
             exportLogs: () => LogStorage.exportLogs(),
             clearLogs: () => LogStorage.clearLogs(),
